@@ -1,0 +1,59 @@
+
+============================================================
+SCENARIO: Warm Interested Lead | Score: 90/100
+============================================================
+SDR (Vicky): Hey Margaret, this is Vicky from National Benefits Group. How are you doing today?
+Prospect (Margaret): Well, hello there Vicky! I'm doin' just as sweet as can be, thank you for askin'. It's so nice to hear from you. I hope you're havin' a wonderful day too. I was just fixin' to make myself a glass of sweet tea on the porch, and now I'm glad I got to take a break and chat with you instead. What's on your mind, dear? How can I help you today?
+SDR (Vicky): It's so great to hear from you too! I'm glad I caught you at a good time. I wanted to follow up on some final expense insurance you looked into a while back. Are you still thinkin' about gettin' some coverage in place?
+Prospect (Margaret): Bless your heart, Vicky! I'm so glad you called about that final expense insurance. Yes, I've been thinkin' about it a lot lately, and I'm gettin' to that point where I want to make sure everything is taken care of for my family. I don't want them to have to worry about any funeral expenses or medical bills if somethin' were to happen to me.
+
+I've been doin' some research and talkin' to my friends, and it seems like a lot of folks around here have gotten that kind of insurance. It gives me peace of mind to know that I've got somethin' in place.
+
+Can you tell me a little bit more about the different options you have available? I think I remember you sendin' me some information in the mail, but I'd love to hear more about it from you directly. What's the best way to get started with this, sweetie?
+SDR (Vicky): That's so thoughtful of you, thinkin' about your family's well-being. I completely understand. You're lookin' into gettin' final expense insurance to cover funeral expenses and medical bills, is that right?
+
+You mentioned gettin' some information in the mail before. Can you tell me a little bit about what you're currently lookin' for in a policy? And do you already have any other type of insurance coverage in place?
+Prospect (Margaret): Yes, that's exactly right, Vicky! I want to make sure my family doesn't have to worry about any extra expenses on top of their grief. And bless your heart, you're so kind to be helpin' me with all this.
+
+Now, let me think on it for a sec... I remember gettin' some information from you folks about different types of final expense insurance policies. I think I was lookin' at a few different options, but I'm not sure which one would be best for me.
+
+As for what I'm lookin' for in a policy, I think I'd like to get somethin' that'll cover my funeral expenses, and maybe some extra for any medical bills that might come up. I'd like to get a policy that's affordable, too, 'cause I'm on a fixed income.
+
+As for other insurance coverage, I do have Medicare, and I think I've got some supplemental insurance through my husband's old employer. But I'm not sure if that's enough to cover everything
+SDR (Vicky): It sounds like you're thinkin' about all the right things. Just to confirm, you previously looked into final expense insurance with us, and now you're considerin' gettin' a policy to cover funeral expenses and medical bills. That's great that you have Medicare and supplemental insurance, but it's smart to consider additional coverage.
+
+Can you tell me a little bit about your health, generally speakin'? Are you dealin' with any major health issues, or are you pretty healthy for your age? And if you don't mind me askin', what's your age range? That'll help me get a better idea of what options might be available to you.
+
+Also, what kind of budget are you thinkin' about for a monthly premium? Are you lookin' at somethin' around $20-50 a month, or somethin' a bit higher?
+Prospect (Margaret): Thank you for confirmmin' that, Vicky! I'm glad we're on the same page.
+
+Now, let me think on my health for a sec... I'd say I'm pretty healthy for my age. I'm 72, and I've got a few little aches and pains here and there, but I'm still gettin' around just fine. I've got a bit of arthritis in my knees, and my doctor's been keepin' an eye on my blood pressure, but other than that, I'm doin' pretty well. I've had a few surgeries over the years, but I'm not dealin' with any major health issues right now.
+
+As for my budget, I'm thinkin' around $50-75 a month would be a good range for me. I'm on a fixed income, so I want to make sure I can afford it. I'd rather pay a little bit more each month than have to worry about a big bill later on.
+
+I've heard that some of these final expense insurance policies can
+SDR (Vicky): It sounds like you're in good shape health-wise, and that's great. I appreciate you sharin' that with me.
+
+Okay, so you're lookin' at a budget of $50-75 a month, and you're interested in gettin' a final expense insurance policy that'll give you some peace of mind. I'd like to set up a call with one of our licensed specialists who can go over your options and give you a better idea of what might work for you.
+
+Would you be available for a quick 10-15 minute call tomorrow at 2 PM, or maybe Thursday morning? They can answer all your questions and give you a better sense of what you might be lookin' at in terms of coverage and premium. Would that work for you?
+Prospect (Margaret): That sounds perfect, Vicky! I'd love to set up a call with one of your specialists. I'm free tomorrow at 2 PM, so that would work great for me. Just make sure to give me a reminder, 'cause I might forget with all the things on my mind these days!
+
+I'm lookin' forward to talkin' with someone who can give me a better idea of what my options are. I've got a lot of questions, and I'm sure they'll be able to help me figure out what's best for me.
+
+Thank you so much for takin' care of this for me, Vicky. You're makin' this process so much easier for me, and I appreciate it. I'll talk to you tomorrow at 2 PM, then!
+
+============================================================
+SCENARIO: Skeptical Prospect - Scam Concern | Score: 60/100
+============================================================
+SDR (Vicky): Hey Robert, this is Vicky from National Benefits Group. How are you doing today?
+Prospect (Robert): (slowly and cautiously) Ah, I'm doin' alright, I s'pose. Can't complain. But I gotta ask, how'd you get my number? I don't recall givin' it to anyone. And what's this National Benefits Group business? You're not tryin' to sell me somethin', are ya? (pausing, ready to hang up)
+
+============================================================
+SCENARIO: Hard No — Graceful Exit | Score: 90/100
+============================================================
+SDR (Vicky): Hey Frank, this is Vicky from National Benefits Group. How are you doing today?
+Prospect (Frank): Not interested.
+SDR (Vicky): I completely understand. The rates have actually come down quite a bit. Would it be worth just a quick 5-minute call with our specialist, no obligation at all?
+Prospect (Frank): Not interested.
+SDR (Vicky): No worries at all. I appreciate your time. If you change your mind or have any questions in the future, feel free to reach out. Have a great day!

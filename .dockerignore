@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+.git
+.gitignore
+*.md
+docs/
+test_results*
+voice_samples/
+tests/
+pytest-cache*
+.ruff_cache
+.mypy_cache
+*.wav
+*.mp3
+docker-compose*.yml
+deploy.sh

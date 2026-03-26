@@ -1,0 +1,39 @@
+
+============================================================
+Warm Interested Lead (Score: 0/100)
+============================================================
+SDR (Alex): Hi, is this Margaret? Hey, this is Alex calling from National Benefits Group. How are you doing today?
+Prospect: Well, bless your heart, Alex! I'm doin' just fine, thank you for askin'. It's so nice to talk to you. I was just fixin' myself a glass of sweet tea on the porch. You know, enjoying the afternoon. What can I do for you, sweetie? You're callin' from National Benefits Group, you say? That's a name I don't recognize. What's this about, darlin'?
+
+============================================================
+Skeptical Prospect - Scam Concern (Score: 0/100)
+============================================================
+SDR (Alex): Hi, is this Robert? Hey, this is Alex calling from National Benefits Group. How are you doing today?
+Prospect: (slowly and cautiously) Ah, who is this again? Alex, you say? From National Benefits Group? (pausing) I don't recall giving you folks my number. How did you get my contact information? And what's this about? You're not trying to sell me something, are you? (firm but polite tone) I've got a lot of scams going around these days, and I'm not interested in any of that nonsense. What do you want?
+SDR (Alex): I completely understand your concerns, and I appreciate your caution. My name is Alex, and I'm a Sales Development Representative with National Benefits Group. You had actually filled out a form online about final expense insurance, or burial insurance, a little while back. I'm not trying to sell you anything today, but rather to connect you with one of our licensed insurance specialists who can discuss your options and answer any questions you may have. We're not looking to pressure you into anything, and I just want to make sure you have the most up-to-date information available. Would you like me to give you our website so you can verify, and then we can go from there?
+Prospect: (still skeptical) Hold on, Alex. I'm not sure I filled out any form online. I'm getting on in years, and sometimes I forget what I do from one day to the next. (pausing) Even if I did fill out a form, which I'm not saying I did, how do I know this isn't some kind of phishing scam? You're asking me to verify your company online, but how do I know that's even your real website? (firmly) I've seen some pretty convincing fake websites in my day.
+
+Listen, Alex, I'm not trying to be rude, but I need some more information here. Can you give me your direct phone number, and the name of the insurance specialist you'd like to connect me with? And what's the name of the company, exactly? National Benefits Group... (pausing) That sounds legit, but I've heard of scammers using names that sound real.
+
+And another thing, what's this about final expense insurance or burial insurance? Are you talking about
+SDR (Alex): I totally get it, and I appreciate your diligence. Our company is National Benefits Group, and you can look us up online at nationalbenefitsgroup.com - that's our real website. My direct phone number is 555-123-4567. The insurance specialist I'd like to connect you with is Karen Thompson, and she's a licensed agent with over 10 years of experience.
+
+As for final expense insurance, or burial insurance, it's a type of coverage that can help take care of funeral expenses, medical bills, and other final costs when you pass away. It's usually a whole life policy that guarantees a death benefit, and it's designed to be more affordable and straightforward than traditional life insurance. Karen can walk you through all the details and answer any questions you may have.
+
+I want to assure you that we're a legitimate company, and we're not trying to scam you. We're just trying to follow up with people who have expressed interest in this type of coverage, and see if we can help. If you're
+
+============================================================
+Not Interested - Soft Close Needed (Score: 0/100)
+============================================================
+SDR (Alex): Hi, is this Dorothy? Hey, this is Alex calling from National Benefits Group. How are you doing today?
+Prospect: Hello Alex, yes, this is Dorothy. I'm doing alright, I suppose. Can't complain at my age! What can I do for you? I'm not really looking to change anything with my benefits, so I'm probably not interested in what you're calling about.
+SDR (Alex): Hi Dorothy, it's great to talk to you! I'm Alex from National Benefits Group. I completely understand, and I appreciate your honesty. I'm not here to try to change anything you're currently doing, but I did want to follow up with you about final expense insurance, which you had shown some interest in previously. The rates have actually come down since you last looked, and I think it might be worth just a quick 5-minute call with our specialist to see what's available. No obligation at all, and it could just give you some peace of mind. Would you be open to that?
+
+============================================================
+Hard No — Graceful Exit (Score: 0/100)
+============================================================
+SDR (Alex): Hi, is this Frank? Hey, this is Alex calling from National Benefits Group. How are you doing today?
+Prospect: Not interested.
+SDR (Alex): I completely understand. Just so you know, the rates have come down since you last looked. Would it be worth just a quick 5-minute call with our specialist to see what's available? No obligation at all.
+Prospect: No, not interested.
+SDR (Alex): No worries at all. I appreciate your honesty. If you ever change your mind or have questions in the future, feel free to reach out. Have a great day. (hang up)

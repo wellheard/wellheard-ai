@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellHeard AI — Voice AI That Outperforms Every Competitor</title>
+    <meta name="description" content="Voice AI platform for agencies. From $0.08/min all-in. Sub-500ms latency. $0 platform fee. $0 whitelabel fee. Hear a live demo.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --bg:#07080f;--bg2:#0d1117;--bg3:#161b22;
+            --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,.12);
+            --purple:#a855f7;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;
+            --text:#f0f6fc;--text2:#8b949e;--text3:#484f58;
+            --border:rgba(255,255,255,.06);
+            --glow:0 0 60px rgba(0,229,255,.15);
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+        /* === NAV === */
+        nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 24px;backdrop-filter:blur(20px);background:rgba(7,8,15,.8);border-bottom:1px solid var(--border);transition:all .3s}
+        .nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+        .logo{font-weight:800;font-size:1.35rem;letter-spacing:-.5px;color:var(--text)}
+        .logo span{color:var(--cyan)}
+        .nav-links{display:flex;gap:32px;align-items:center}
+        .nav-links a{color:var(--text2);text-decoration:none;font-size:.875rem;font-weight:500;transition:color .2s}
+        .nav-links a:hover{color:var(--text)}
+        .nav-cta{background:var(--cyan)!important;color:var(--bg)!important;padding:8px 20px;border-radius:6px;font-weight:600!important;font-size:.875rem}
+        .nav-cta:hover{opacity:.9}
+        .hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px}
+        .hamburger span{display:block;width:22px;height:2px;background:var(--text);margin:5px 0;transition:all .3s}
+        .mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(7,8,15,.98);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 24px;z-index:999}
+        .mobile-menu.open{display:block}
+        .mobile-menu a{display:block;color:var(--text2);text-decoration:none;font-size:1rem;font-weight:500;padding:12px 0;border-bottom:1px solid var(--border)}
+        .mobile-menu a:last-child{border-bottom:none}
+        @media(max-width:768px){.nav-links{display:none}.hamburger{display:block}}
+
+        /* === BUTTONS === */
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:8px;font-weight:600;font-size:1rem;text-decoration:none;transition:all .25s;border:none;cursor:pointer;font-family:inherit}
+        .btn-cyan{background:var(--cyan);color:var(--bg)}
+        .btn-cyan:hover{box-shadow:0 0 30px rgba(0,229,255,.4);transform:translateY(-2px)}
+        .btn-outline{background:transparent;color:var(--cyan);border:1.5px solid rgba(0,229,255,.3)}
+        .btn-outline:hover{border-color:var(--cyan);background:rgba(0,229,255,.06)}
+        .btn-sm{padding:10px 20px;font-size:.875rem}
+
+        /* === CONTAINER === */
+        .container{max-width:1200px;margin:0 auto;padding:0 24px}
+        section{padding:100px 0;position:relative}
+
+        /* === HERO === */
+        .hero{padding:140px 0 100px;text-align:center;position:relative;overflow:hidden}
+        .hero::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:800px;background:radial-gradient(circle,rgba(0,229,255,.08) 0%,transparent 70%);pointer-events:none}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:100px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);font-size:.8rem;font-weight:500;color:var(--cyan);margin-bottom:24px}
+        .hero-badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        .hero h1{font-size:clamp(2.8rem,6vw,4.5rem);font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:20px}
+        .hero h1 .accent{background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .hero-sub{font-size:clamp(1.1rem,2vw,1.35rem);color:var(--text2);max-width:680px;margin:0 auto 16px;line-height:1.5}
+        .hero-proof{font-size:.9rem;color:var(--text3);margin-bottom:40px}
+        .hero-proof strong{color:var(--text2)}
+        .hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+
+        /* === METRICS BAR === */
+        .metrics-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:900px;margin:0 auto}
+        .metric-item{background:var(--bg2);padding:28px 20px;text-align:center}
+        .metric-value{font-size:2rem;font-weight:800;letter-spacing:-1px;color:var(--cyan);margin-bottom:4px}
+        .metric-value.green{color:var(--green)}
+        .metric-label{font-size:.8rem;color:var(--text2);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+        @media(max-width:600px){.metrics-bar{grid-template-columns:repeat(2,1fr)}}
+
+        /* === SECTION HEADERS === */
+        .sh{text-align:center;margin-bottom:60px}
+        .sh-tag{display:inline-block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);margin-bottom:12px}
+        .sh h2{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-1px;margin-bottom:16px}
+        .sh p{color:var(--text2);max-width:600px;margin:0 auto;font-size:1.05rem}
+
+        /* === COMPARISON TABLE === */
+        .compare-section{background:var(--bg2)}
+        .compare-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        .compare-table{width:100%;border-collapse:collapse;min-width:700px}
+        .compare-table th,.compare-table td{padding:16px 20px;text-align:center;font-size:.9rem;border-bottom:1px solid var(--border)}
+        .compare-table th{font-weight:600;color:var(--text2);font-size:.75rem;text-transform:uppercase;letter-spacing:1px;padding:12px 20px}
+        .compare-table td:first-child,.compare-table th:first-child{text-align:left;font-weight:600;color:var(--text)}
+        .compare-table .wellheard-col{background:rgba(0,229,255,.04);position:relative}
+        .compare-table .wellheard-col::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)}
+        .compare-table tbody tr:hover{background:rgba(255,255,255,.02)}
+        .val-best{color:var(--green);font-weight:700}
+        .val-mid{color:var(--amber)}
+        .val-bad{color:var(--red);opacity:.7}
+        .check{color:var(--green)}
+        .cross{color:var(--text3)}
+        .crown{font-size:1.1rem}
+
+        /* === HOW IT WORKS === */
+        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:60px}
+        .step{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:36px 28px;position:relative;transition:all .3s}
+        .step:hover{border-color:rgba(0,229,255,.2);transform:translateY(-4px)}
+        .step-num{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--cyan-dim);color:var(--cyan);font-weight:700;font-size:.9rem;margin-bottom:16px}
+        .step h3{font-size:1.15rem;font-weight:700;margin-bottom:8px}
+        .step p{color:var(--text2);font-size:.9rem;line-height:1.6}
+        @media(max-width:768px){.steps{grid-template-columns:1fr}}
+
+        /* === USE CASES === */
+        .use-cases{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
+        .use-case{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:32px;transition:all .3s}
+        .use-case:hover{border-color:rgba(0,229,255,.15)}
+        .use-case-icon{font-size:1.5rem;margin-bottom:12px}
+        .use-case h3{font-size:1.1rem;font-weight:700;margin-bottom:6px}
+        .use-case p{color:var(--text2);font-size:.9rem}
+        .use-case .stat{color:var(--cyan);font-weight:700;font-size:.85rem;margin-top:12px}
+        @media(max-width:600px){.use-cases{grid-template-columns:1fr}}
+
+        /* === PRICING === */
+        .pricing-section{background:var(--bg2)}
+        .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:0 auto}
+        .price-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:36px 28px;position:relative;transition:all .3s}
+        .price-card:hover{transform:translateY(-4px)}
+        .price-card.featured{border-color:var(--cyan);box-shadow:var(--glow)}
+        .price-card.featured::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--cyan);color:var(--bg);padding:4px 16px;border-radius:100px;font-size:.7rem;font-weight:700;letter-spacing:.5px}
+        .price-name{font-size:1rem;font-weight:600;color:var(--text2);margin-bottom:8px}
+        .price-amount{font-size:2.5rem;font-weight:800;letter-spacing:-2px;margin-bottom:4px}
+        .price-amount span{font-size:1rem;font-weight:500;color:var(--text2)}
+        .price-desc{color:var(--text2);font-size:.85rem;margin-bottom:24px;min-height:40px}
+        .price-features{list-style:none;margin-bottom:28px}
+        .price-features li{padding:8px 0;font-size:.875rem;color:var(--text2);display:flex;align-items:flex-start;gap:10px}
+        .price-features li::before{content:'✓';color:var(--cyan);font-weight:700;flex-shrink:0}
+        @media(max-width:768px){.pricing-grid{grid-template-columns:1fr;max-width:400px}}
+
+        /* === TESTIMONIALS === */
+        .testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+        .testimonial{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .3s}
+        .testimonial:hover{border-color:rgba(0,229,255,.15)}
+        .testimonial-text{color:var(--text2);font-size:.95rem;line-height:1.6;margin-bottom:16px;font-style:italic}
+        .testimonial-author{display:flex;align-items:center;gap:12px}
+        .testimonial-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--bg)}
+        .testimonial-name{font-weight:600;font-size:.9rem}
+        .testimonial-role{font-size:.8rem;color:var(--text3)}
+        @media(max-width:768px){.testimonials-grid{grid-template-columns:1fr}}
+
+        /* === LIVE DEMO SECTION === */
+        .demo-section{background:linear-gradient(135deg,rgba(0,229,255,.04) 0%,rgba(168,85,247,.04) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+        .demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+        .demo-visual{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative}
+        .demo-visual::before{content:'';position:absolute;inset:-1px;border-radius:16px;background:linear-gradient(135deg,rgba(0,229,255,.2),rgba(168,85,247,.2));z-index:-1;opacity:0;transition:opacity .3s}
+        .demo-visual:hover::before{opacity:1}
+        .waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:80px;margin-bottom:20px}
+        .waveform .bar{width:4px;border-radius:2px;background:var(--cyan);animation:wave 1.2s ease-in-out infinite}
+        .waveform .bar:nth-child(2){animation-delay:.1s;height:60%}
+        .waveform .bar:nth-child(3){animation-delay:.2s;height:90%}
+        .waveform .bar:nth-child(4){animation-delay:.3s;height:40%}
+        .waveform .bar:nth-child(5){animation-delay:.4s;height:70%}
+        .waveform .bar:nth-child(6){animation-delay:.5s;height:55%}
+        .waveform .bar:nth-child(7){animation-delay:.6s;height:85%}
+        .waveform .bar:nth-child(8){animation-delay:.7s;height:45%}
+        .waveform .bar:nth-child(9){animation-delay:.8s;height:75%}
+        .waveform .bar:nth-child(10){animation-delay:.9s;height:50%}
+        @keyframes wave{0%,100%{height:20%}50%{height:100%}}
+        .demo-label{text-align:center;color:var(--text2);font-size:.85rem}
+        .demo-label strong{color:var(--cyan)}
+        @media(max-width:768px){.demo-grid{grid-template-columns:1fr}}
+
+        /* === ROI CALCULATOR === */
+        .roi-calc{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:800px;margin:0 auto}
+        .roi-inputs{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px}
+        .roi-field label{display:block;font-size:.85rem;font-weight:500;color:var(--text2);margin-bottom:6px}
+        .roi-field input,.roi-field select{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1rem;font-family:inherit}
+        .roi-field input:focus,.roi-field select:focus{outline:none;border-color:var(--cyan)}
+        .roi-result{background:var(--bg);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:28px;text-align:center}
+        .roi-savings{font-size:2.5rem;font-weight:800;color:var(--green);letter-spacing:-2px}
+        .roi-label{color:var(--text2);font-size:.9rem;margin-top:4px}
+        @media(max-width:600px){.roi-inputs{grid-template-columns:1fr}}
+
+        /* === CTA BANNER === */
+        .cta-section{text-align:center;padding:120px 0;position:relative;overflow:hidden}
+        .cta-section::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:1000px;height:600px;background:radial-gradient(circle,rgba(0,229,255,.1) 0%,transparent 60%);pointer-events:none}
+        .cta-section h2{font-size:clamp(2rem,4vw,3.2rem);font-weight:800;letter-spacing:-1px;margin-bottom:16px}
+        .cta-section p{color:var(--text2);font-size:1.1rem;max-width:550px;margin:0 auto 32px}
+
+        /* === FOOTER === */
+        footer{border-top:1px solid var(--border);padding:48px 0 32px;background:var(--bg)}
+        .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:40px}
+        .footer-brand p{color:var(--text2);font-size:.875rem;margin-top:8px;max-width:280px}
+        .footer-col h4{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:16px}
+        .footer-col a{display:block;color:var(--text2);text-decoration:none;font-size:.875rem;padding:4px 0;transition:color .2s}
+        .footer-col a:hover{color:var(--text)}
+        .footer-bottom{border-top:1px solid var(--border);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--text3)}
+        @media(max-width:768px){.footer-grid{grid-template-columns:1fr 1fr;gap:32px}}
+
+        /* === ANIMATIONS === */
+        .fade-up{opacity:0;transform:translateY(30px);transition:all .6s ease}
+        .fade-up.visible{opacity:1;transform:translateY(0)}
+    </style>
+</head>
+<body>
+
+<!-- === NAV === -->
+<nav>
+    <div class="nav-inner">
+        <div class="logo">Well<span>Heard</span></div>
+        <div class="nav-links">
+            <a href="#compare">vs Competitors</a>
+            <a href="#how">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="/docs">API Docs</a>
+            <a href="/get-started" class="nav-cta">See Live Demo</a>
+        </div>
+        <button class="hamburger" onclick="document.getElementById('mobile-menu').classList.toggle('open')" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+<div class="mobile-menu" id="mobile-menu">
+    <a href="#compare" onclick="document.getElementById('mobile-menu').classList.remove('open')">vs Competitors</a>
+    <a href="#how" onclick="document.getElementById('mobile-menu').classList.remove('open')">How It Works</a>
+    <a href="#pricing" onclick="document.getElementById('mobile-menu').classList.remove('open')">Pricing</a>
+    <a href="/docs">API Docs</a>
+    <a href="/get-started" style="color:var(--cyan);font-weight:600">See Live Demo →</a>
+</div>
+
+<!-- === HERO === -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-badge"><span class="pulse"></span> Live — handling calls right now</div>
+        <h1>Voice AI that <span class="accent">outperforms</span><br>at a fraction of the cost</h1>
+        <p class="hero-sub">From $0.08/min all-in. Sub-500ms response. $0 platform fee. $0 whitelabel fee.<br>Same quality as VAPI, Bland, Retell — without the hidden costs.</p>
+        <p class="hero-proof">Trusted by insurance agencies, sales teams, and call centers</p>
+        <div class="hero-btns">
+            <a href="/get-started" class="btn btn-cyan">See Your AI Employees in Action →</a>
+            <a href="/docs" class="btn btn-outline">View API Docs</a>
+        </div>
+
+        <div class="metrics-bar fade-up">
+            <div class="metric-item">
+                <div class="metric-value">$0.08</div>
+                <div class="metric-label">Per Minute, All-In</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">&lt;500ms</div>
+                <div class="metric-label">Response Latency</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value green">$0</div>
+                <div class="metric-label">Platform & Whitelabel Fee</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">99.9%</div>
+                <div class="metric-label">Uptime SLA</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === COMPARISON TABLE === -->
+<section id="compare" class="compare-section">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">Side-by-Side Comparison</div>
+            <h2>See exactly how WellHeard stacks up</h2>
+            <p>Real numbers. No asterisks. We publish what others hide.</p>
+        </div>
+        <div class="compare-wrap fade-up">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="wellheard-col"><span class="crown">👑</span> WellHeard</th>
+                        <th>VAPI</th>
+                        <th>Bland AI</th>
+                        <th>Retell AI</th>
+                        <th>Synthflow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Typical All-In Cost/Min</td>
+                        <td class="wellheard-col val-best">From $0.08</td>
+                        <td class="val-bad">$0.12–0.20*</td>
+                        <td class="val-mid">$0.12–0.14</td>
+                        <td class="val-mid">$0.07–0.31*</td>
+                        <td class="val-mid">$0.13–0.24*</td>
+                    </tr>
+                    <tr>
+                        <td>Pricing Model</td>
+                        <td class="wellheard-col val-best">All-in — nothing extra</td>
+                        <td class="val-bad">$0.05/min + provider costs</td>
+                        <td class="val-best">All-in</td>
+                        <td class="val-mid">Varies by provider choice</td>
+                        <td class="val-mid">Voice + LLM + telephony separate</td>
+                    </tr>
+                    <tr>
+                        <td>Response Latency</td>
+                        <td class="wellheard-col val-best">&lt;500ms</td>
+                        <td>Varies by config</td>
+                        <td>Varies by config</td>
+                        <td class="val-mid">~780ms published</td>
+                        <td class="val-best">~420ms published</td>
+                    </tr>
+                    <tr>
+                        <td>Platform Fee</td>
+                        <td class="wellheard-col val-best">$0/mo</td>
+                        <td>$0/mo</td>
+                        <td class="val-mid">Up to $499/mo</td>
+                        <td>$0/mo</td>
+                        <td class="val-bad">$2,000/mo whitelabel</td>
+                    </tr>
+                    <tr>
+                        <td>Whitelabel</td>
+                        <td class="wellheard-col check">✓ Full</td>
+                        <td class="check">✓ BYO Keys</td>
+                        <td class="cross">✗ Limited</td>
+                        <td class="check">✓ Available</td>
+                        <td class="check">✓ $2K/mo add-on</td>
+                    </tr>
+                    <tr>
+                        <td>WebSocket API</td>
+                        <td class="wellheard-col check">✓ Native</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="cross">✗</td>
+                    </tr>
+                    <tr>
+                        <td>Try Before You Buy</td>
+                        <td class="wellheard-col val-best">Live AI demo</td>
+                        <td class="val-mid">$10 free credits</td>
+                        <td class="val-mid">Free tier</td>
+                        <td class="val-mid">$10 free credits</td>
+                        <td class="val-mid">Included in plan</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="text-align:center;margin-top:32px;color:var(--text3);font-size:.8rem">
+            *Varies by configuration. Pricing sourced from official pricing pages, March 2026. VAPI adds STT/LLM/TTS at cost on top of $0.05/min platform fee. Synthflow charges voice, LLM, and telephony separately.
+        </div>
+    </div>
+</section>
+
+<!-- === LIVE DEMO === -->
+<section id="demo" class="demo-section">
+    <div class="container">
+        <div class="demo-grid fade-up">
+            <div>
+                <div class="sh-tag">Hear It Yourself</div>
+                <h2 style="font-size:clamp(1.8rem,3.5vw,2.5rem);font-weight:800;letter-spacing:-1px;margin:12px 0 16px">Don't take our word for it.<br>Listen to a live call.</h2>
+                <p style="color:var(--text2);font-size:1.05rem;margin-bottom:24px">Our AI sounds natural, responds in under 500ms, handles interruptions, and qualifies leads better than most human SDRs. Judge for yourself.</p>
+                <a href="/get-started" class="btn btn-cyan">Try a Live Demo Call →</a>
+                <p style="color:var(--text3);font-size:.8rem;margin-top:12px">Enter your website. Hear a custom demo in 30 seconds.</p>
+            </div>
+            <div class="demo-visual">
+                <div class="waveform">
+                    <div class="bar" style="height:30%"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px">
+                    <div style="background:var(--bg2);border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:1.3rem;font-weight:800;color:var(--green)">&lt;500ms</div>
+                        <div style="font-size:.75rem;color:var(--text3)">Target Response Time</div>
+                    </div>
+                    <div style="background:var(--bg2);border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:1.3rem;font-weight:800;color:var(--cyan)">Natural</div>
+                        <div style="font-size:.75rem;color:var(--text3)">Human-Like Voices</div>
+                    </div>
+                    <div style="background:var(--bg2);border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:1.3rem;font-weight:800;color:var(--purple)">24/7</div>
+                        <div style="font-size:.75rem;color:var(--text3)">Always Available</div>
+                    </div>
+                    <div style="background:var(--bg2);border-radius:8px;padding:16px;text-align:center">
+                        <div style="font-size:1.3rem;font-weight:800;color:var(--amber)">All-In</div>
+                        <div style="font-size:.75rem;color:var(--text3)">No Hidden Costs</div>
+                    </div>
+                </div>
+                <div class="demo-label" style="margin-top:16px">Enter your website above to hear a personalized demo</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === HOW IT WORKS === -->
+<section id="how">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">Integration</div>
+            <h2>Live in 15 minutes, not 15 days</h2>
+            <p>One WebSocket endpoint. Raw audio in, AI audio out. That's it.</p>
+        </div>
+        <div class="steps fade-up">
+            <div class="step">
+                <div class="step-num">1</div>
+                <h3>Connect via WebSocket</h3>
+                <p>Open a WebSocket to our endpoint. Send a JSON start event with the call_id and lead data. We handle everything else — STT, LLM, TTS — in one pipeline.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <h3>Stream Audio Both Ways</h3>
+                <p>Send raw mulaw 8kHz audio frames from the phone call. We stream back AI speech in real-time. No JSON wrapping on audio — just raw bytes, minimum latency.</p>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <h3>Get Results via Webhook</h3>
+                <p>After each call, we POST full results to your webhook — transcript, disposition, duration, transfer status. Plug it straight into your CRM or dialer.</p>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:48px" class="fade-up">
+            <a href="/docs" class="btn btn-outline btn-sm">Read Full API Documentation →</a>
+        </div>
+    </div>
+</section>
+
+<!-- === USE CASES === -->
+<section style="background:var(--bg2)">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">Built For</div>
+            <h2>Every call-heavy vertical, automated</h2>
+        </div>
+        <div class="use-cases fade-up">
+            <div class="use-case">
+                <div class="use-case-icon">🏥</div>
+                <h3>Insurance — Medicare & Final Expense</h3>
+                <p>AI SDRs that qualify leads, verify eligibility, and warm-transfer to licensed agents. Fraction of the cost of human agents, running 24/7.</p>
+                <div class="stat">↑ More calls at a fraction of the cost</div>
+            </div>
+            <div class="use-case">
+                <div class="use-case-icon">🏢</div>
+                <h3>Agency Whitelabel</h3>
+                <p>Run WellHeard under your own brand. Set your own per-minute pricing. Your clients never see our name. Full API, full control.</p>
+                <div class="stat">$0 platform fee — keep 100% of your markup</div>
+            </div>
+            <div class="use-case">
+                <div class="use-case-icon">📞</div>
+                <h3>Call Centers & BPOs</h3>
+                <p>Handle after-hours overflow, outbound campaigns, and appointment confirmations. Cut operational costs 40-60% while scaling instantly.</p>
+                <div class="stat">↓ Up to 80% cost reduction vs alternatives</div>
+            </div>
+            <div class="use-case">
+                <div class="use-case-icon">🏠</div>
+                <h3>Real Estate & Solar</h3>
+                <p>Qualify inbound leads 24/7. Confirm appointments. Follow up on no-shows. AI handles the volume, humans close the deals.</p>
+                <div class="stat">AI handles volume, humans close deals</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === ROI CALCULATOR === -->
+<section id="roi">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">ROI Calculator</div>
+            <h2>See your savings in 10 seconds</h2>
+            <p>Enter your current call volume. We'll show you the math.</p>
+        </div>
+        <div class="roi-calc fade-up">
+            <div class="roi-inputs">
+                <div class="roi-field">
+                    <label>Calls per month</label>
+                    <input type="number" id="roi-calls" value="5000" min="100" step="100">
+                </div>
+                <div class="roi-field">
+                    <label>Average call duration (min)</label>
+                    <input type="number" id="roi-duration" value="3" min="1" max="30" step="0.5">
+                </div>
+                <div class="roi-field">
+                    <label>Current cost per call ($)</label>
+                    <input type="number" id="roi-cost" value="7" min="0.5" step="0.5">
+                </div>
+                <div class="roi-field">
+                    <label>Compare against</label>
+                    <select id="roi-competitor">
+                        <option value="0.16">VAPI ($0.05 + providers ≈ $0.16/min)</option>
+                        <option value="0.13">Bland AI ($0.12–0.14/min all-in)</option>
+                        <option value="0.15">Retell AI ($0.07–0.31, ~$0.15/min typical)</option>
+                        <option value="0.18">Synthflow ($0.13–0.24, ~$0.18/min typical)</option>
+                        <option value="0">Human agents only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="roi-result">
+                <div style="font-size:.85rem;color:var(--text2);margin-bottom:4px">Your monthly savings with WellHeard</div>
+                <div class="roi-savings" id="roi-savings-display">$33,625</div>
+                <div class="roi-label" id="roi-detail">vs current: $35,000/mo → with WellHeard: $375/mo</div>
+                <div style="margin-top:16px">
+                    <a href="/get-started" class="btn btn-cyan btn-sm">See My Savings in Action →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === TESTIMONIALS === -->
+<section style="background:var(--bg2)">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">Results</div>
+            <h2>What teams are saying</h2>
+        </div>
+        <div class="testimonials-grid fade-up">
+            <div class="testimonial">
+                <div class="testimonial-text">"We switched from Retell and significantly cut our voice AI costs. Same quality, faster responses. The migration took 2 hours."</div>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">MR</div>
+                    <div>
+                        <div class="testimonial-name">Marcus R.</div>
+                        <div class="testimonial-role">CTO, Insurance Agency</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial">
+                <div class="testimonial-text">"The WebSocket API is incredibly clean. We were streaming audio and getting AI responses within 15 minutes of reading the docs."</div>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">DL</div>
+                    <div>
+                        <div class="testimonial-name">David L.</div>
+                        <div class="testimonial-role">Lead Engineer, Dialer Platform</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial">
+                <div class="testimonial-text">"We whitelabel WellHeard for 40+ clients. $0 platform fee means our margins are incredible. No other provider comes close on price."</div>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">SK</div>
+                    <div>
+                        <div class="testimonial-name">Sarah K.</div>
+                        <div class="testimonial-role">Founder, AI Agency</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- === PRICING === -->
+<section id="pricing" class="pricing-section">
+    <div class="container">
+        <div class="sh fade-up">
+            <div class="sh-tag">Simple Pricing</div>
+            <h2>One price. Everything included.</h2>
+            <p>No per-provider fees. No surprise charges. STT, LLM, TTS, telephony — all in one rate.</p>
+        </div>
+        <div class="pricing-grid fade-up">
+            <div class="price-card">
+                <div class="price-name">Starter</div>
+                <div class="price-amount">$0.10<span>/min</span></div>
+                <div class="price-desc">Pay as you go. No platform fee. Everything included.</div>
+                <ul class="price-features">
+                    <li>50% off your first month</li>
+                    <li>Full WebSocket API access</li>
+                    <li>STT + LLM + TTS all included</li>
+                    <li>Webhook integrations</li>
+                    <li>Real-time transcripts</li>
+                    <li>Email support</li>
+                </ul>
+                <a href="/get-started" class="btn btn-outline" style="width:100%;justify-content:center">See Demo →</a>
+            </div>
+            <div class="price-card featured">
+                <div class="price-name">Agency</div>
+                <div class="price-amount">$0.08<span>/min</span></div>
+                <div class="price-desc">Volume pricing + full whitelabel. $0/mo platform fee.</div>
+                <ul class="price-features">
+                    <li>Everything in Starter</li>
+                    <li>Full whitelabel (your brand, your domain)</li>
+                    <li>Set your own client pricing</li>
+                    <li>Custom AI scripts per client</li>
+                    <li>Priority support + Slack channel</li>
+                    <li>Dedicated account manager</li>
+                </ul>
+                <a href="/get-started" class="btn btn-cyan" style="width:100%;justify-content:center">See Agency Demo →</a>
+            </div>
+            <div class="price-card">
+                <div class="price-name">Enterprise</div>
+                <div class="price-amount">Custom</div>
+                <div class="price-desc">Dedicated infrastructure & SLA for high volume.</div>
+                <ul class="price-features">
+                    <li>Everything in Agency</li>
+                    <li>Dedicated infrastructure</li>
+                    <li>99.99% uptime SLA</li>
+                    <li>HIPAA / SOC2 compliance</li>
+                    <li>Custom voice cloning</li>
+                    <li>On-call engineering support</li>
+                </ul>
+                <a href="mailto:hello@wellheard.ai" class="btn btn-outline" style="width:100%;justify-content:center">Talk to Us →</a>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:32px;color:var(--text3);font-size:.85rem">
+            50% off your first month. Cancel anytime. See a live demo before you pay.
+        </div>
+    </div>
+</section>
+
+<!-- === FINAL CTA === -->
+<section class="cta-section">
+    <div class="container fade-up">
+        <h2>Hear your AI team<br>before you pay a cent.</h2>
+        <p>Enter your website — we'll build custom AI employees for your business and let you hear them live. Then activate with 50% off your first month.</p>
+        <div class="hero-btns">
+            <a href="/get-started" class="btn btn-cyan">Build My AI Team →</a>
+            <a href="/docs" class="btn btn-outline">Read the Docs First</a>
+        </div>
+    </div>
+</section>
+
+<!-- === FOOTER === -->
+<footer>
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <div class="logo" style="font-size:1.5rem">Well<span>Heard</span></div>
+                <p>Voice AI infrastructure for teams that need calls handled at scale. Built for performance, priced for growth.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Product</h4>
+                <a href="#compare">vs Competitors</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#roi">ROI Calculator</a>
+                <a href="/docs">API Docs</a>
+            </div>
+            <div class="footer-col">
+                <h4>Use Cases</h4>
+                <a href="/get-started">Insurance</a>
+                <a href="/get-started">Agency Whitelabel</a>
+                <a href="/get-started">Call Centers</a>
+                <a href="/get-started">Real Estate</a>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <a href="mailto:hello@wellheard.ai">Contact</a>
+                <a href="/docs">Documentation</a>
+                <a href="https://status.wellheard.ai">Status</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 WellHeard AI. All rights reserved.</span>
+            <span>hello@wellheard.ai</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+// === ROI Calculator ===
+function calcROI(){
+    const calls=+document.getElementById('roi-calls').value||0;
+    const dur=+document.getElementById('roi-duration').value||0;
+    const humanCost=+document.getElementById('roi-cost').value||0;
+    const compRate=+document.getElementById('roi-competitor').value;
+    const totalMin=calls*dur;
+    const currentCost=compRate>0?totalMin*compRate:calls*humanCost;
+    const wellheardCost=totalMin*0.08;
+    const savings=currentCost-wellheardCost;
+    document.getElementById('roi-savings-display').textContent='$'+Math.max(0,Math.round(savings)).toLocaleString();
+    document.getElementById('roi-detail').textContent=
+        'vs current: $'+Math.round(currentCost).toLocaleString()+'/mo → with WellHeard: $'+Math.round(wellheardCost).toLocaleString()+'/mo';
+}
+document.querySelectorAll('.roi-field input,.roi-field select').forEach(el=>el.addEventListener('input',calcROI));
+calcROI();
+
+// === Scroll Animations ===
+const obs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
+},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// === Nav shrink ===
+window.addEventListener('scroll',()=>{
+    document.querySelector('nav').style.background=window.scrollY>50?'rgba(7,8,15,.95)':'rgba(7,8,15,.8)';
+});
+</script>
+</body>
+</html>

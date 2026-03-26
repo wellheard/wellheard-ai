@@ -1,0 +1,200 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# WellHeard AI — Google Cloud Run Service Configuration (Declarative)
+# Deploy with: gcloud run services replace cloudrun-service.yaml --region=us-east1
+#
+# This YAML provides declarative configuration for the Cloud Run service.
+# For WebSocket support, Cloud Run uses HTTP/2 with session affinity enabled.
+# Optimized for voice calls with 1 vCPU, 512MB memory, session affinity, and
+# long timeouts to support up to 1-hour voice conversations.
+# ═══════════════════════════════════════════════════════════════════════════
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: wellheard-ai
+  namespace: default
+  labels:
+    app: wellheard-ai
+    managed-by: gcloud
+  annotations:
+    # Cloud Run specific annotations
+    run.googleapis.com/launch-stage: BETA                    # Enable beta features (WebSocket support)
+    run.googleapis.com/sessionAffinity: 'true'              # Session affinity for WebSocket persistence
+    run.googleapis.com/cpu-throttling: 'false'              # Always allocate CPU
+
+spec:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Traffic configuration
+  # ─────────────────────────────────────────────────────────────────────────
+  traffic:
+    - percent: 100
+      latestRevision: true
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Template for the service (revision configuration)
+  # ─────────────────────────────────────────────────────────────────────────
+  template:
+    metadata:
+      name: wellheard-ai-latest
+      labels:
+        app: wellheard-ai
+      annotations:
+        autoscaling.knative.dev/minScale: '1'              # Keep 1 instance warm
+        autoscaling.knative.dev/maxScale: '100'            # Scale to max 100 instances
+        # WebSocket support annotations
+        run.googleapis.com/launch-stage: BETA              # Enable beta features
+        run.googleapis.com/sessionAffinity: 'true'         # Session affinity for WebSocket stickiness
+        run.googleapis.com/cpu-throttling: 'false'         # CPU always allocated for WebSockets
+        # Concurrency: 1 request per instance (one call per container)
+        run.googleapis.com/max-request-concurrency: '1'
+
+    spec:
+      # ───────────────────────────────────────────────────────────────────
+      # Service account (for Secret Manager access)
+      # ───────────────────────────────────────────────────────────────────
+      serviceAccountName: default
+
+      # ───────────────────────────────────────────────────────────────────
+      # Container specification
+      # ───────────────────────────────────────────────────────────────────
+      containers:
+        - name: wellheard-ai
+          image: us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:latest
+          imagePullPolicy: Always
+
+          # Port configuration
+          ports:
+            - name: http1
+              containerPort: 8000
+              protocol: TCP
+
+          # Resource limits (1 vCPU, 512Mi memory)
+          resources:
+            limits:
+              cpu: '1'
+              memory: 512Mi
+            requests:
+              cpu: '1'
+              memory: 512Mi
+
+          # Environment variables (non-sensitive)
+          env:
+            - name: HV_HOST
+              value: "0.0.0.0"
+            - name: HV_PORT
+              value: "8000"
+            - name: HV_DEBUG
+              value: "false"
+            - name: HV_DEFAULT_PIPELINE
+              value: "budget"
+            - name: HV_DEEPGRAM_STT_MODEL
+              value: "nova-3"
+            - name: HV_DEEPGRAM_TTS_MODEL
+              value: "aura-orpheus-en"
+            - name: HV_GROQ_MODEL
+              value: "llama-3.3-70b-versatile"
+            - name: HV_GEMINI_MODEL
+              value: "gemini-2.5-flash"
+            - name: HV_CARTESIA_MODEL
+              value: "sonic-3"
+            - name: HV_CARTESIA_SPEED
+              value: "1.0"
+            - name: HV_CARTESIA_EMOTION
+              value: "positivity:medium"
+            - name: HV_TELEPHONY_PROVIDER
+              value: "twilio"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+
+          # Secrets (sensitive variables from Secret Manager)
+          envFrom:
+            - secretRef:
+                name: wellheard-ai-secrets
+
+          # Liveness probe (Cloud Run health check)
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: 8000
+              httpHeaders:
+                - name: User-Agent
+                  value: CloudRun-HealthCheck/1.0
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe (Kubernetes-style readiness check)
+          readinessProbe:
+            httpGet:
+              path: /v1/health/ready
+              port: 8000
+              httpHeaders:
+                - name: User-Agent
+                  value: CloudRun-HealthCheck/1.0
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 2
+
+          # Startup probe (time to first request)
+          startupProbe:
+            httpGet:
+              path: /v1/health
+              port: 8000
+              httpHeaders:
+                - name: User-Agent
+                  value: CloudRun-HealthCheck/1.0
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 10  # 50 seconds to start
+
+          # Security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+
+      # ───────────────────────────────────────────────────────────────────
+      # Pod-level configuration
+      # ───────────────────────────────────────────────────────────────────
+      timeoutSeconds: 3600  # One hour timeout for long-running voice calls
+      concurrency: 1        # One request per instance (one call per container)
+
+---
+# ═══════════════════════════════════════════════════════════════════════════
+# Secret Configuration and Deployment Instructions
+#
+# Secrets are managed via Google Cloud Secret Manager.
+# Create secrets with:
+#   gcloud secrets create HV_API_KEY --replication-policy="automatic"
+#   gcloud secrets add-iam-policy-binding HV_API_KEY \
+#     --member="serviceAccount:default@heyvox-491318.iam.gserviceaccount.com" \  # GCP project ID (immutable)
+#     --role="roles/secretmanager.secretAccessor"
+#   gcloud secrets versions add HV_API_KEY --data-file=-
+#
+# Required secrets in Cloud Secret Manager:
+#   HV_API_KEY
+#   HV_DEEPGRAM_API_KEY
+#   HV_GROQ_API_KEY
+#   HV_GOOGLE_API_KEY
+#   HV_CARTESIA_API_KEY
+#   HV_CARTESIA_VOICE_ID
+#   HV_TWILIO_ACCOUNT_SID
+#   HV_TWILIO_AUTH_TOKEN
+#   HV_TWILIO_API_KEY_SID
+#   HV_TWILIO_API_KEY_SECRET
+#   HV_TWILIO_PHONE_NUMBER
+#   HV_TELNYX_API_KEY
+#   HV_TELNYX_SIP_USERNAME
+#   HV_TELNYX_SIP_PASSWORD
+#   HV_TELNYX_CONNECTION_ID
+#
+# Deployment:
+#   gcloud run services replace cloudrun-service.yaml --region=us-east1
+# ═══════════════════════════════════════════════════════════════════════════

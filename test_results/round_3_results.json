@@ -1,0 +1,156 @@
+{
+  "round": 3,
+  "timestamp": "2026-03-23T17:05:07.415152",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.8,
+      "avg_turn_latency_ms": 343.9,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Margaret? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Well, bless your heart! I'm doin' just fine, thank ya for askin', Alex. It's so nice to talk to ya. I was just fixin' myself a glass of sweet tea on the porch. How 'bout you, dear? How's your day goin'? And what can I do for you from National Benefits Group? You know, I'm gettin' up there in years, and I'm always lookin' for ways to make sure I'm takin' care of myself."
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Robert? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "not_interested",
+      "name": "Not Interested - Soft Close Needed",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Dorothy? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "callback_hold",
+      "name": "Callback Request / Busy Prospect",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.5,
+      "avg_turn_latency_ms": 158.7,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this James? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: (distracted) Oh, hi Alex... yeah, that's me, James. (pausing to answer another question in the background) Hold on a sec, I think I need to... (back to the phone) Sorry about that. What was that? You're from National Benefits Group? (muttering to himself) I think I need to pay that bill... (back to the phone) Ah, yes, how can I help you, Alex?"
+    },
+    {
+      "scenario_id": "voicemail",
+      "name": "Voicemail \u2014 Leave Message",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Patricia? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "already_covered",
+      "name": "Already Has Coverage",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Harold? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Frank? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "elderly_confused",
+      "name": "Elderly Confused Prospect",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.4,
+      "avg_turn_latency_ms": 150.5,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Edna? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: *cups hand around ear* Eh?  Who's... calling? *speaks slowly* I... didn't quite... catch that. Could... you... speak... up? *leans in* What's... your name? *struggles to hear*"
+    },
+    {
+      "scenario_id": "price_shopper",
+      "name": "Price Shopper",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.4,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this William? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "interruption_heavy",
+      "name": "Frequent Interrupter",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Tony? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    }
+  ]
+}

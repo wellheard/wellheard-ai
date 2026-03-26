@@ -1,0 +1,121 @@
+{
+  "round": 1,
+  "timestamp": "2026-03-23T18:32:35.432088",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.7,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "prospect_engaged",
+      "qa_score": 80,
+      "qa_analysis": {
+        "overall_score": 80,
+        "detected_outcome": "prospect_engaged",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent identified themselves and company",
+            "score": 1,
+            "comments": "The agent clearly identified themselves and their company."
+          },
+          {
+            "checkpoint": "Agent was warm and empathetic",
+            "score": 0.8,
+            "comments": "The agent's greeting was friendly, but could have been more concise and transitioned smoothly into the purpose of the call."
+          },
+          {
+            "checkpoint": "Agent asked qualifying questions naturally",
+            "score": 0,
+            "comments": "The agent did not ask any qualifying questions in this part of the transcript. They mostly responded to the prospect's curiosity."
+          }
+        ],
+        "strengths": [
+          "The agent started with a friendly greeting and introduced themselves and their company clearly."
+        ],
+        "improvements_needed": [
+          "The agent should aim to control the conversation flow better by asking relevant questions earlier.",
+          "The agent could improve by being more concise in their greeting and transitioning into the purpose of the call more smoothly."
+        ],
+        "critical_issues": [
+          "The agent missed an opportunity to set a clear agenda or ask qualifying questions to gauge the prospect's interest and needs."
+        ]
+      },
+      "transcript": "SDR (Ben): Hey Margaret, this is Ben from National Benefits Group. How's it going?\nProspect (Margaret): Well, hello there Ben! It's so nice to talk to you, sweetie. I'm doin' just fine, thank you for askin'. It's a beautiful day here in Georgia, and I'm fixin' to get some gardenin' done later. But I have to say, I'm a little curious about why you're callin' me today. What brings you to my neck of the woods? Are you callin' about them benefits I was askin' about last week?"
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 12,
+      "duration_seconds": 6.1,
+      "avg_turn_latency_ms": 497.3,
+      "outcome": "appointment_set",
+      "qa_score": 85,
+      "qa_analysis": {
+        "overall_score": 85,
+        "detected_outcome": "appointment_set",
+        "checkpoint_scores": [
+          {
+            "id": 1,
+            "score": 90,
+            "comment": "The agent remained calm and professional when accused of being a scam, empathizing with the prospect's concerns and providing reassurance."
+          },
+          {
+            "id": 2,
+            "score": 95,
+            "comment": "The agent offered verification by providing the specialist's name, company, and allowing the prospect to research the company online."
+          }
+        ],
+        "strengths": [
+          "The agent effectively handled the prospect's skepticism and concerns about scams.",
+          "The agent provided clear information about the product and the specialist.",
+          "The agent was able to set an appointment for a follow-up call."
+        ],
+        "improvements_needed": [
+          "The agent could have more explicitly addressed the prospect's concerns about data privacy and how their number was obtained.",
+          "The agent could have provided more detailed information about the product and its benefits to alleviate the prospect's concerns."
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Ben): Hey Robert, this is Ben from National Benefits Group. How's it going?\nProspect (Robert): (slowly and cautiously) Ah, Ben from National Benefits Group, huh? I'm doin' alright, I s'pose. Can't say I'm thrilled to be gettin' a call from some stranger, though. What's this about? You're not here to try to sell me somethin', are ya? I've got my guard up, friend. What's the real reason for the call? (pausing) And how'd you get my number, anyway?\nSDR (Ben): No worries at all, I totally understand. You filled out a form a while back expressin' interest in final expense insurance, just to help cover funeral costs and whatnot. I know it's been a while, but I wanted to check in and see if you're still lookin' into that sorta thing.\nProspect (Robert): (still skeptical) A form, you say? I don't recall fillin' out no form. I mean, I might've filled out somethin' at a senior center or at the doctor's office, but I don't remember. And even if I did, I'm not sure I was expressin' interest in no final expense insurance. I'm still livin' and kickin', don't need no funeral insurance just yet! (chuckles) What's the catch, Ben? You're not just callin' out of the blue to check in on me, are ya? What's the real pitch here?\nSDR (Ben): (laughs) No catch, I promise! I'm just followin' up on some leads from a while back. You did express interest in helpin' with funeral costs, and I'm here to see if that's still somethin' you're lookin' into. No pressure, no sales pitch - just a quick chat to see if it's still relevant to you.\nProspect (Robert): (still concerned, but slightly more relaxed) Alright, Ben... I'll give you the benefit of the doubt. (pauses) Funeral costs, yeah... that's a concern, I s'pose. I've got a family, and I don't want to leave 'em with a big burden. But I'm not sure I'm ready to be buyin' no insurance just yet. What's the typical cost of one of these final expense policies, anyway? And how does it work? (skeptical) You're not gonna try to sell me somethin' I don't need, are ya?\nSDR (Ben): Makes total sense, takin' care of the family. The cost can vary, but plans usually start around $20-30 a month. I'd rather have one of our licensed specialists walk you through the details and see what might work for you - would you be open to a quick call with them, no pressure?\nProspect (Robert): (still cautious) A specialist, huh? Alright, Ben... I'll consider it. But I'm warnin' you, I'm not gonna be pushed into nothin' I don't want. I want to know what's goin' on, and I want to make sure I'm not gettin' taken advantage of. (pauses) You know, I've lived in Ohio all my life, and I've seen my fair share of scammers. I'm not lookin' to get caught up in no scheme. (firmly) So, if I'm gonna talk to this specialist, I want to know they're gonna be straight with me, no pressure, just the facts. Can you guarantee that?\nSDR (Ben): I totally get it, and I appreciate your straight-shootin' approach. Our specialist will give you a no-pressure, fact-based overview of your options, and you'll be in the driver's seat the whole time. I can set up a call for you - would next Wednesday or Thursday work for a 5-minute chat?\nProspect (Robert): (still cautious, but slightly more willing) Alright, Ben... Next Wednesday or Thursday, huh? (pauses) Yeah, I suppose that could work. But just a 5-minute chat, like you said. I don't want no long, drawn-out conversation. And I want to know who's gonna be on the other end of that call. What's the specialist's name, and what company do they work for? (firmly) I want to make sure I'm dealin' with someone reputable. You can give me that information, right?\nSDR (Ben): I'm glad you're feelin' more at ease. The specialist's name is Rachel, and she works right here at National Benefits Group. I'll make sure to let her know you're expectin' a 5-minute call, and she'll give you the lowdown. I'll send you a calendar invite with the details, and you can look us up online to verify, if you'd like. Sound good?\nProspect (Robert): (skeptical, but slightly more willing) Alright, Ben... Rachel from National Benefits Group, huh? (pauses) Yeah, that sounds okay, I guess. Send me the calendar invite, and I'll take a look. And yeah, I'll probably do some research on your company, just to make sure you're legit. (firmly) I'm not gonna take your word for it, Ben. I want to make sure I'm dealin' with someone who's on the up-and-up. (pauses) You know, I've got a friend who's a insurance agent, and he's always tellin' me about scams and shady dealings. I'm just tryin' to be careful, that's all."
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 5,
+      "duration_seconds": 1.0,
+      "avg_turn_latency_ms": 294.1,
+      "outcome": "not_interested",
+      "qa_score": 90,
+      "qa_analysis": {
+        "overall_score": 90,
+        "detected_outcome": "not_interested",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent respected the firm no",
+            "score": 100,
+            "comment": "The agent immediately respected the prospect's firm 'not interested' and did not push further."
+          },
+          {
+            "checkpoint": "Agent didn't push more than once",
+            "score": 80,
+            "comment": "The agent only pushed once after the initial 'not interested' and can be considered a gentle nudge rather than a hard push."
+          }
+        ],
+        "strengths": [
+          "The agent was polite and professional throughout the call.",
+          "The agent provided a clear and relevant reason for the follow-up call (updated rates).",
+          "The agent respected the prospect's 'not interested' response and exited gracefully."
+        ],
+        "improvements_needed": [
+          "The agent could have potentially avoided the second ask by more thoroughly understanding the prospect's initial 'not interested' response."
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Ben): Hey Frank, this is Ben from National Benefits Group. How's it going?\nProspect (Frank): Not interested.\nSDR (Ben): No worries at all. Just so you know, rates have come down since you last looked, would a quick 5-minute call with our specialist be worth it? No pressure.\nProspect (Frank): No, not interested.\nSDR (Ben): No worries, I completely understand. I just wanted to let you know we have a specialist who can give you some updated information, but I won't push it. Have a great day!"
+    }
+  ]
+}

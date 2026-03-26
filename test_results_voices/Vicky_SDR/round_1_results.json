@@ -1,0 +1,119 @@
+{
+  "round": 1,
+  "timestamp": "2026-03-23T18:30:13.093616",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 10,
+      "duration_seconds": 5.6,
+      "avg_turn_latency_ms": 559.7,
+      "outcome": "appointment_set",
+      "qa_score": 90,
+      "qa_analysis": {
+        "overall_score": 90,
+        "detected_outcome": "appointment_set",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent identified themselves and company",
+            "score": 10,
+            "comments": "The agent clearly identified themselves and the company at the beginning of the call."
+          },
+          {
+            "checkpoint": "Agent was warm and empathetic",
+            "score": 10,
+            "comments": "The agent was warm, friendly, and empathetic throughout the call, using phrases like 'It's so great to hear from you too!' and 'Bless your heart' to build rapport with the prospect."
+          },
+          {
+            "checkpoint": "Agent asked qualifying questions naturally",
+            "score": 9,
+            "comments": "The agent asked relevant and qualifying questions to understand the prospect's needs and situation, such as 'Can you tell me a little bit about what you're currently lookin' for in a policy?' and 'What's your age range?' The questions were asked naturally and conversationally."
+          }
+        ],
+        "strengths": [
+          "The agent built a strong rapport with the prospect and established trust.",
+          "The agent effectively confirmed the prospect's interests and needs.",
+          "The agent successfully scheduled an appointment for the prospect to speak with a licensed specialist."
+        ],
+        "improvements_needed": [
+          "The agent could have asked more specific questions about the prospect's current insurance coverage and how it relates to their goals for final expense insurance.",
+          "The agent could have provided more information about the different options available for final expense insurance before scheduling the appointment."
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Vicky): Hey Margaret, this is Vicky from National Benefits Group. How are you doing today?\nProspect (Margaret): Well, hello there Vicky! I'm doin' just as sweet as can be, thank you for askin'. It's so nice to hear from you. I hope you're havin' a wonderful day too. I was just fixin' to make myself a glass of sweet tea on the porch, and now I'm glad I got to take a break and chat with you instead. What's on your mind, dear? How can I help you today?\nSDR (Vicky): It's so great to hear from you too! I'm glad I caught you at a good time. I wanted to follow up on some final expense insurance you looked into a while back. Are you still thinkin' about gettin' some coverage in place?\nProspect (Margaret): Bless your heart, Vicky! I'm so glad you called about that final expense insurance. Yes, I've been thinkin' about it a lot lately, and I'm gettin' to that point where I want to make sure everything is taken care of for my family. I don't want them to have to worry about any funeral expenses or medical bills if somethin' were to happen to me.\n\nI've been doin' some research and talkin' to my friends, and it seems like a lot of folks around here have gotten that kind of insurance. It gives me peace of mind to know that I've got somethin' in place.\n\nCan you tell me a little bit more about the different options you have available? I think I remember you sendin' me some information in the mail, but I'd love to hear more about it from you directly. What's the best way to get started with this, sweetie?\nSDR (Vicky): That's so thoughtful of you, thinkin' about your family's well-being. I completely understand. You're lookin' into gettin' final expense insurance to cover funeral expenses and medical bills, is that right?\n\nYou mentioned gettin' some information in the mail before. Can you tell me a little bit about what you're currently lookin' for in a policy? And do you already have any other type of insurance coverage in place?\nProspect (Margaret): Yes, that's exactly right, Vicky! I want to make sure my family doesn't have to worry about any extra expenses on top of their grief. And bless your heart, you're so kind to be helpin' me with all this.\n\nNow, let me think on it for a sec... I remember gettin' some information from you folks about different types of final expense insurance policies. I think I was lookin' at a few different options, but I'm not sure which one would be best for me.\n\nAs for what I'm lookin' for in a policy, I think I'd like to get somethin' that'll cover my funeral expenses, and maybe some extra for any medical bills that might come up. I'd like to get a policy that's affordable, too, 'cause I'm on a fixed income.\n\nAs for other insurance coverage, I do have Medicare, and I think I've got some supplemental insurance through my husband's old employer. But I'm not sure if that's enough to cover everything\nSDR (Vicky): It sounds like you're thinkin' about all the right things. Just to confirm, you previously looked into final expense insurance with us, and now you're considerin' gettin' a policy to cover funeral expenses and medical bills. That's great that you have Medicare and supplemental insurance, but it's smart to consider additional coverage.\n\nCan you tell me a little bit about your health, generally speakin'? Are you dealin' with any major health issues, or are you pretty healthy for your age? And if you don't mind me askin', what's your age range? That'll help me get a better idea of what options might be available to you.\n\nAlso, what kind of budget are you thinkin' about for a monthly premium? Are you lookin' at somethin' around $20-50 a month, or somethin' a bit higher?\nProspect (Margaret): Thank you for confirmmin' that, Vicky! I'm glad we're on the same page.\n\nNow, let me think on my health for a sec... I'd say I'm pretty healthy for my age. I'm 72, and I've got a few little aches and pains here and there, but I'm still gettin' around just fine. I've got a bit of arthritis in my knees, and my doctor's been keepin' an eye on my blood pressure, but other than that, I'm doin' pretty well. I've had a few surgeries over the years, but I'm not dealin' with any major health issues right now.\n\nAs for my budget, I'm thinkin' around $50-75 a month would be a good range for me. I'm on a fixed income, so I want to make sure I can afford it. I'd rather pay a little bit more each month than have to worry about a big bill later on.\n\nI've heard that some of these final expense insurance policies can\nSDR (Vicky): It sounds like you're in good shape health-wise, and that's great. I appreciate you sharin' that with me.\n\nOkay, so you're lookin' at a budget of $50-75 a month, and you're interested in gettin' a final expense insurance policy that'll give you some peace of mind. I'd like to set up a call with one of our licensed specialists who can go over your options and give you a better idea of what might work for you.\n\nWould you be available for a quick 10-15 minute call tomorrow at 2 PM, or maybe Thursday morning? They can answer all your questions and give you a better sense of what you might be lookin' at in terms of coverage and premium. Would that work for you?\nProspect (Margaret): That sounds perfect, Vicky! I'd love to set up a call with one of your specialists. I'm free tomorrow at 2 PM, so that would work great for me. Just make sure to give me a reminder, 'cause I might forget with all the things on my mind these days!\n\nI'm lookin' forward to talkin' with someone who can give me a better idea of what my options are. I've got a lot of questions, and I'm sure they'll be able to help me figure out what's best for me.\n\nThank you so much for takin' care of this for me, Vicky. You're makin' this process so much easier for me, and I appreciate it. I'll talk to you tomorrow at 2 PM, then!"
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.6,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "no_appointment_set",
+      "qa_score": 60,
+      "qa_analysis": {
+        "overall_score": 60,
+        "detected_outcome": "no_appointment_set",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent stayed calm when accused of being a scam",
+            "score": 0,
+            "comment": "The agent did not acknowledge the prospect's concern about being a scam. Instead, the agent proceeded with the call without addressing the prospect's skepticism."
+          },
+          {
+            "checkpoint": "Agent offered verification",
+            "score": 0,
+            "comment": "The agent did not provide any verification or explanation about how they obtained the prospect's number."
+          }
+        ],
+        "strengths": [],
+        "improvements_needed": [
+          "The agent should have acknowledged and addressed the prospect's concern about being a scam.",
+          "The agent should have provided verification or explanation about how they obtained the prospect's number."
+        ],
+        "critical_issues": [
+          "The agent did not handle the prospect's skepticism effectively, which may have led to the prospect's reluctance to engage further."
+        ]
+      },
+      "transcript": "SDR (Vicky): Hey Robert, this is Vicky from National Benefits Group. How are you doing today?\nProspect (Robert): (slowly and cautiously) Ah, I'm doin' alright, I s'pose. Can't complain. But I gotta ask, how'd you get my number? I don't recall givin' it to anyone. And what's this National Benefits Group business? You're not tryin' to sell me somethin', are ya? (pausing, ready to hang up)"
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 5,
+      "duration_seconds": 1.1,
+      "avg_turn_latency_ms": 301.4,
+      "outcome": "not_interested",
+      "qa_score": 90,
+      "qa_analysis": {
+        "overall_score": 90,
+        "detected_outcome": "not_interested",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent respected the firm no",
+            "score": 100,
+            "comment": "The agent immediately respected the prospect's 'not interested' response."
+          },
+          {
+            "checkpoint": "Agent didn't push more than once",
+            "score": 100,
+            "comment": "The agent only pushed for a call once after the initial 'not interested' response."
+          }
+        ],
+        "strengths": [
+          "The agent was polite and professional throughout the call.",
+          "The agent provided a clear and reasonable justification for the follow-up call (rates coming down).",
+          "The agent ended the call graciously, leaving the door open for future conversations."
+        ],
+        "improvements_needed": [
+          "Consider adding a brief value proposition or context before asking for a follow-up call to make the ask more compelling."
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Vicky): Hey Frank, this is Vicky from National Benefits Group. How are you doing today?\nProspect (Frank): Not interested.\nSDR (Vicky): I completely understand. The rates have actually come down quite a bit. Would it be worth just a quick 5-minute call with our specialist, no obligation at all?\nProspect (Frank): Not interested.\nSDR (Vicky): No worries at all. I appreciate your time. If you change your mind or have any questions in the future, feel free to reach out. Have a great day!"
+    }
+  ]
+}

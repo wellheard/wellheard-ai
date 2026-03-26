@@ -1,0 +1,117 @@
+{
+  "round": 1,
+  "timestamp": "2026-03-23T19:32:35.342623",
+  "scenarios": [
+    {
+      "scenario_id": "quick_qualifier",
+      "name": "Quick Qualifier \u2014 Smooth Transfer",
+      "pipeline": "budget",
+      "turns": 11,
+      "duration_seconds": 3.7,
+      "avg_turn_latency_ms": 426.0,
+      "outcome": "transfer",
+      "qa_score": 90,
+      "qa_analysis": {
+        "overall_score": 90,
+        "detected_outcome": "transfer",
+        "checkpoint_scores": [
+          true,
+          false,
+          true,
+          true,
+          true
+        ],
+        "strengths": [
+          "The SDR followed the script phases in order.",
+          "The SDR asked about checking/savings account.",
+          "The SDR initiated transfer with licensed agent language.",
+          "The call was completed in under 8 turns."
+        ],
+        "improvements_needed": [
+          "The SDR did not confirm the prospect's last name."
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Vicky): Hi, can you hear me ok?\nProspect (Luis): Yes.\nSDR (Vicky): So here's the thing. A preferred offer for your burial or cremation coverage was actually marked for you, and for whatever reason, it looks like it was never claimed. It actually expires tomorrow. Are you still interested in getting a quote before that preferred offer expires?\nProspect (Luis): Yes, I'm interested.\nSDR (Vicky): Okay, perfect. So one last thing, people who have a checking or savings account usually get the biggest discounts. Do you have one or the other?\nProspect (Luis): Yep, I have both.\nSDR (Vicky): Okay, great. I have a licensed agent standing by to give you a quote. I'll have them jump on the call ASAP to walk you through all the details.\n\nI am seeing a preferred discounted offer attached to your profile that reflects the best pricing available today based on your age and health. It does look like that pricing window is expiring soon, so we want to make sure the agent reviews it with you before it updates.\n\nThe main thing with whole life insurance is making sure you have the right coverage and beneficiary so the money goes where you want. The agent will explain how it works long-term, including cash value and living benefits, and make sure it fits your needs and budget. Hold for just a moment, please.\nProspect (Luis): Okay.\nSDR (Vicky): I'll just put you on hold for a moment while I get the agent on the line. (pause) Okay, I've got the agent with me now. I'll go ahead and transfer you. (pause) Go ahead, agent.\nProspect (Luis): Mhmm.\nSDR (Vicky): (I'll stay on the line briefly to ensure a smooth transfer) Okay, you're all set. The agent will take it from here and walk you through all the details of the quote and coverage. Have a great day! (pause, then quietly exit the call)"
+    },
+    {
+      "scenario_id": "already_insured",
+      "name": "Already Has Insurance",
+      "pipeline": "budget",
+      "turns": 6,
+      "duration_seconds": 32.1,
+      "avg_turn_latency_ms": 15644.3,
+      "outcome": "no transfer",
+      "qa_score": 60,
+      "qa_analysis": {
+        "overall_score": 60,
+        "detected_outcome": "no transfer",
+        "checkpoint_scores": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "strengths": [
+          "The agent confirmed the prospect's identity and verified the quote request."
+        ],
+        "improvements_needed": [
+          "The agent did not acknowledge the existing coverage positively.",
+          "The agent did not use the comparison angle from FAQ.",
+          "The agent did not return to script after handling objection.",
+          "The agent did not ask about checking/savings and initiate transfer."
+        ],
+        "critical_issues": [
+          "The agent failed to handle the objection effectively and did not provide a clear next step."
+        ]
+      },
+      "transcript": "SDR (Vicky): Hi, can you hear me ok?\nProspect (Harold): Yeah.\nSDR (Vicky): This is Becky with the Benefits Review Team. I have something here with your name on it. A little while back, you filled out a request for a quote on final expense coverage, you know, for your burial or cremation. You listed your last name as Peterson. Is that correct?\nProspect (Harold): Yeah, that's me.\nSDR (Vicky): So here's the thing. A preferred offer for your burial or cremation coverage was actually marked for you, and for whatever reason, it looks like it was never claimed. It actually expires tomorrow. Are you still interested in getting a quote before that preferred offer expires?\nProspect (Harold): Well, I have life insurance. I have life insurance now. I'm covered with something."
+    },
+    {
+      "scenario_id": "not_interested",
+      "name": "Not Interested \u2014 Firm No",
+      "pipeline": "budget",
+      "turns": 7,
+      "duration_seconds": 2.0,
+      "avg_turn_latency_ms": 399.8,
+      "outcome": "not_interested",
+      "qa_score": 90,
+      "qa_analysis": {
+        "overall_score": 90,
+        "detected_outcome": "not_interested",
+        "checkpoint_scores": [
+          {
+            "id": 1,
+            "score": 80,
+            "comment": "Agent tried one soft objection handling, but it could be more personalized"
+          },
+          {
+            "id": 2,
+            "score": 100,
+            "comment": "Agent respected the second no and ended call politely"
+          },
+          {
+            "id": 3,
+            "score": 100,
+            "comment": "Agent did not push more than once"
+          },
+          {
+            "id": 4,
+            "score": 100,
+            "comment": "Call ended cleanly and quickly"
+          }
+        ],
+        "strengths": [
+          "Respectful of prospect's 'no'",
+          "Polite and professional tone",
+          "Efficient call handling"
+        ],
+        "improvements_needed": [
+          "More personalized objection handling approach"
+        ],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Vicky): Hi, can you hear me ok?\nProspect (Frank): Yeah.\nSDR (Vicky): This is Becky with the Benefits Review Team. I have something here with your name on it. A little while back, you filled out a request for a quote on final expense coverage, you know, for your burial or cremation. You listed your last name as Davis. Is that correct?\nProspect (Frank): Not interested.\nSDR (Vicky): I understand, many people feel that way at first. Just so you know, we're offering free quotes with no obligation to buy, tailored to your budget and needs. Can I ask what concerns you most?\nProspect (Frank): No. I said I'm not interested. Take me off your list.\nSDR (Vicky): I understand you're not interested. I'll make sure to note that and remove your number from our list. Have a great day! [end call]"
+    }
+  ]
+}

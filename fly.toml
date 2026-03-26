@@ -1,0 +1,54 @@
+# ═══════════════════════════════════════════════════════════════════
+# WellHeard AI — Fly.io Production Configuration
+# Deploy: flyctl deploy
+# ═══════════════════════════════════════════════════════════════════
+app = "wellheard-ai"
+
+# CRITICAL: Deploy in US-East to co-locate with Deepgram (AWS us-east-1)
+# and minimize hops to Groq (Dallas) and Cartesia (NA)
+primary_region = "iad"  # Ashburn, Virginia
+
+kill_signal  = "SIGINT"
+kill_timeout = 10
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  HV_HOST        = "0.0.0.0"
+  HV_PORT        = "8000"
+  HV_BASE_URL    = "https://wellheard-ai.fly.dev"
+  HV_REDIS_URL   = "redis://localhost:6379/0"
+  PYTHONUNBUFFERED = "1"
+
+# ── Web Service ───────────────────────────────────────────────────
+[http_service]
+  internal_port     = 8000
+  force_https       = true
+  auto_stop_machines = false   # Voice AI must be always-on (no cold starts)
+  auto_start_machines = true
+  min_machines_running = 1     # Always keep 1 machine warm
+  processes          = ["app"]
+
+  [http_service.concurrency]
+    type       = "connections"
+    hard_limit = 100           # Max 100 concurrent calls per machine
+    soft_limit = 80            # Start scaling at 80
+
+  [[http_service.checks]]
+    interval    = "10s"
+    timeout     = "3s"
+    grace_period = "15s"
+    method      = "GET"
+    path        = "/v1/health"
+
+# ── Machine Sizing ────────────────────────────────────────────────
+# shared-cpu-2x is the sweet spot: enough CPU for 50+ concurrent
+# async pipelines without paying for dedicated cores
+[[vm]]
+  size   = "shared-cpu-2x"
+  memory = "1gb"
+  processes = ["app"]
+
+# ── Redis Sidecar (lightweight state management) ──────────────────
+# For production at scale, replace with Upstash Redis or Fly Redis

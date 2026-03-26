@@ -1,0 +1,156 @@
+{
+  "round": 1,
+  "timestamp": "2026-03-23T17:04:52.736507",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.4,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Margaret? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Well, bless your heart! I'm doin' just fine, thank you for askin', Alex. It's so nice to talk to you. I was just fixin' myself a glass of sweet tea on the porch. How 'bout you, dear? How's your day goin'? And what can I do for you from National Benefits Group? You know, I'm gettin' up there in years, and I'm always lookin' for ways to make sure I'm takin' care of myself."
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 5,
+      "duration_seconds": 2.4,
+      "avg_turn_latency_ms": 611.8,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Robert? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: (slowly and cautiously) Ah, yeah... this is Robert. I'm doin' alright, I s'pose. But I gotta ask, how'd you get my number? And what's this National Benefits Group business? You're not one of them telemarketers, are ya? (pausing, expecting a sales pitch)\nSDR (Alex): I completely understand your concerns, Robert. My name is Alex, and I'm a Sales Development Representative with National Benefits Group. We actually got your number because you filled out a form online a while back, expressing interest in final expense insurance, also known as burial insurance. I want to assure you right off the bat that I'm not here to push anything on you. I'm just calling to see if we can help you with your options. You can look us up online, we're a legitimate company, and I'm just here to set up a call with one of our licensed specialists who can walk you through everything. No obligation, no pressure. How's that sound?\nProspect: (still skeptical, but slightly more open) Hmm, okay... I did fill out one of them online forms a while back, thinkin' it might be a good idea to look into gettin' some burial insurance. But I gotta say, I'm still not sure about all this. How do I know you're not just tryin' to sell me somethin' I don't need? And what's this \"no obligation, no pressure\" business? That sounds like somethin' a used car salesman would say. (pausing) What's the name of this licensed specialist you're gonna set me up with? And what's their number? I want to make sure I can call 'em back and verify all this. And another thing, what's the company website I can look you up on? I want to see some reviews and make sure you're legit. (still cautious, but willing to listen)\nSDR (Alex): I totally get it, Robert. You're right to be cautious. I appreciate your willingness to listen, though. The specialist I'll set you up with is named Karen, and she's one of our experienced agents. She's not going to sell you anything; she's just going to have a conversation with you about your options and see if we can help.\n\nAs for our company, National Benefits Group, you can look us up online at [website URL]. We've got a solid reputation, and you can check out our reviews on sites like Google or Yelp. I'm not going to give you Karen's number just yet, but I can give you our main number: [phone number]. You can call us back and ask for Karen, and she'll be happy to talk to you.\n\nI want to assure you, Robert, that we're not here to push anything on you. We're just trying to help people like you plan for the future. And I promise you, Karen will be transparent and upfront about everything. She's"
+    },
+    {
+      "scenario_id": "not_interested",
+      "name": "Not Interested - Soft Close Needed",
+      "pipeline": "budget",
+      "turns": 3,
+      "duration_seconds": 1.1,
+      "avg_turn_latency_ms": 699.7,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Dorothy? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Hello Alex, yes, this is Dorothy. I'm doing alright, I suppose. What can I do for you? I'm not really interested in talking to anyone about benefits or insurance or anything like that. I've got all that taken care of, I think. (pausing) Unless... (skeptical) ...you're calling about my Medicare, and even then, I'm not sure I'm interested.\nSDR (Alex): Hi Dorothy, it's great to talk to you. My name is Alex, and I'm with National Benefits Group. I completely understand, I appreciate your honesty. I'm not calling about Medicare, and I'm not trying to sell you anything. I'm actually following up on some interest you expressed in final expense insurance, or burial insurance, a little while back. I know it's not something people often want to think about, but I just wanted to check in and see if it's still something you might be curious about. The rates have actually come down since you last looked, and I think it might be worth just a quick 5-minute call with our specialist to see what's available. No obligation at all, and it could just give you some peace of mind. Would that be something you'd be open to, or is that something you've just ruled out for now?"
+    },
+    {
+      "scenario_id": "callback_hold",
+      "name": "Callback Request / Busy Prospect",
+      "pipeline": "budget",
+      "turns": 8,
+      "duration_seconds": 4.1,
+      "avg_turn_latency_ms": 576.8,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this James? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: (distracted) Oh, hi Alex... National Benefits... (pauses) I'm doing alright, I suppose. Busy day, got a lot on my plate. (mutters to himself) Got to pick up dry cleaning, and then I've got a doctor's appointment... (back to phone) What can I do for you, Alex? (not fully focused)\nSDR (Alex): Sorry to interrupt your busy day. I completely understand. I'm Alex from National Benefits Group, and I'm following up on a form you filled out online about final expense coverage. You had expressed interest in learning more about burial insurance, and I wanted to see if that was still something on your mind. No rush, take your time.\nProspect: (still distracted, but trying to focus) Ah, burial insurance... right. (pauses) I think I did fill out that form. (chuckles) I'm getting up there in years, and I figured it's something I should look into. You know, for the family. Don't want to leave them with a big burden. (trails off) Wait, what was the question again? Oh, am I still interested? (pauses) Yeah, I suppose so. What's the... (pauses again) You know, what's the basic idea? How does it work? (background noise of rustling papers)\nSDR (Alex): I hear you, and that's really thoughtful of you to think about your family's well-being. The basic idea of final expense insurance, or burial insurance, is to help cover the costs associated with your funeral, medical bills, and other final expenses, so your loved ones don't have to bear the burden. It can be a simple way to ensure they've got some financial support during a difficult time. I don't want to take up too much of your time, but I did want to check in and see if it still makes sense for you to explore this option. Can I ask, do you currently have any kind of coverage in place for final expenses?\nProspect: (distracted by a ringing phone in the background) Ah, coverage... (pauses) Let me think for a moment. I've got a... (pauses again) I've got a small policy through my old employer, I think. It's a life insurance policy, but I'm not sure if it's enough to cover... (trails off) You know, funeral costs and all that. (answers the ringing phone in the background) Not now, honey, I'm on the phone... (back to Alex) Sorry about that. Where was I? Ah yes, coverage. I'm not sure if it's enough, to be honest. (chuckles) I'm not exactly sure what I've got. Do you think you could... (pauses) You know, give me a quick idea of what something like this would cost? Just a ballpark figure? (sounds like he's getting up from his chair)\nSDR (Alex): I completely understand, and no worries about the interruption. It sounds like you've got some existing coverage, but you're not sure if it's enough. That's a great question to have, and I'm happy to help. As for the cost, plans typically start around $20-30 a month, but it really depends on a few factors, like your age and health. I'd rather have our specialist walk you through the details, make sure you get accurate information. Would you be open to a quick call with them? They can give you a better idea of what options might be available, and what might fit your budget. How about tomorrow at 2 PM, or would Thursday morning work better for you?\nProspect: (thinks for a moment) Tomorrow at 2 PM... (pauses) I think that might work. I've got a few things I need to take care of in the morning, but I should be free in the afternoon. (checks his schedule) Yeah, tomorrow at 2 PM sounds good. ( scribbles on a piece of paper) 2 PM, tomorrow... (back to phone) What's the specialist's name, and what can I expect from the call? (distracted) Oh, and can you make sure they're not going to try to sell me something I don't need? I don't want to get caught up in one of those... (trails off) You know, sales pitches."
+    },
+    {
+      "scenario_id": "voicemail",
+      "name": "Voicemail \u2014 Leave Message",
+      "pipeline": "budget",
+      "turns": 4,
+      "duration_seconds": 1.4,
+      "avg_turn_latency_ms": 432.6,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Patricia? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: \"Hello Alex, I'm not available to take your call right now. Please leave a message with your name, number, and a brief message, and I'll get back to you as soon as possible. You can also press 1 to hear a list of available extensions. After the tone, please leave your message.\" *beep*\nSDR (Alex): \"Hello, this is Alex from National Benefits Group. I'm following up on your interest in final expense insurance. I'd love to set up a quick call with one of our licensed specialists to discuss your options. If you're available, please give me a call back at 555-1234. If not, no worries at all - I'll try again another time. Thanks, and I look forward to speaking with you soon.\"\nProspect: \"Message saved. You have 1 new message. To listen to your messages, press 1. To erase this message, press 7. Goodbye.\" *click* \n\n(I'll store the message for Patricia to retrieve later)\n\nPatricia, you have 1 new message from Alex at National Benefits Group. The message is as follows:\n\n\"Hello, this is Alex from National Benefits Group. I'm following up on your interest in final expense insurance. I'd love to set up a quick call with one of our licensed specialists to discuss your options. If you're available, please give me a call back at 555-1234. If not, no worries at all - I'll try again another time. Thanks, and I look forward to speaking with you soon.\" \n\nPlease press 1 to listen to the message, or 7 to erase it."
+    },
+    {
+      "scenario_id": "already_covered",
+      "name": "Already Has Coverage",
+      "pipeline": "budget",
+      "turns": 9,
+      "duration_seconds": 3.6,
+      "avg_turn_latency_ms": 487.9,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Harold? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Hi Alex, this is Harold. I'm doing alright, thanks for asking. How can I help you? I do have existing coverage, just to let you know upfront.\nSDR (Alex): Hi Harold, thanks for picking up! I'm Alex from National Benefits Group. I appreciate you being upfront about having existing coverage - that's great! Many folks find it's still worth taking a look at their options, as rates and plans can change over time. Would you be open to just a quick comparison to see if we can find something that might work better for you?\nProspect: Thanks for understanding, Alex. I appreciate your approach. To be honest, I'm not really looking to switch plans at the moment, but I suppose it couldn't hurt to take a look. I'm just curious, what's the process like? Would it be a quick call or would I need to provide a lot of information? And just to clarify, you're not going to try to sell me something that I don't need, right?\nSDR (Alex): I completely understand, Harold. The process is really straightforward. I'd just set up a quick call with one of our licensed specialists, and they'd walk you through your current plan and see if there's anything that might be a better fit. It would be a 10-15 minute call, max. And I want to assure you, no pressure at all - it's just an exploratory conversation. They'll listen to your needs and give you some options. No selling or pushing anything on you. How about I schedule that call for you? Would tomorrow at 2 PM or Thursday morning work better?\nProspect: That sounds pretty low-key, Alex. I appreciate your transparency about the process. Tomorrow at 2 PM works better for me. I'm free then. What's the best way to get the details of the call set up, and who will be calling me? Is it going to be one of your specialists, or should I expect a call from someone else?\nSDR (Alex): I'll go ahead and schedule that call for you, Harold. The specialist who will be calling you is named Karen. She's one of our experienced agents who focuses on final expense coverage. I'll confirm your phone number - just to make sure I have it right, it's still the same one you provided online, correct? And I'll let Karen know that you're expecting her call tomorrow at 2 PM. She'll give you a call then, and like I said, it'll just be a quick chat to review your options. Does that sound good to you?\nProspect: That sounds good, Alex. Yes, the phone number is still the same. You can confirm it as 555-1234. And I appreciate you letting Karen know that I'm expecting the call. I'm looking forward to speaking with her tomorrow at 2 PM. Thanks for setting that up and for being so straightforward about the whole process. I feel like I can trust that this isn't going to be a high-pressure sales call.\nSDR (Alex): I'm glad I could set that up for you, Harold. I've confirmed your phone number as 555-1234, and I'll make sure Karen knows to call you tomorrow at 2 PM. I appreciate your kind words, and I want to assure you again that we're not about high-pressure sales tactics. We're just here to help people understand their options and make informed decisions. Karen will be professional, knowledgeable, and respectful of your time. If you have any questions or concerns before the call, feel free to reach out to me directly. Otherwise, I'm glad we could connect, and I look forward to hearing how the call goes. Have a great day, Harold!"
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 5,
+      "duration_seconds": 1.4,
+      "avg_turn_latency_ms": 457.3,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Frank? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Not interested.\nSDR (Alex): I completely understand. Just so you know, the rates have come down since you last looked. Would it be worth just a quick 5-minute call with our specialist to see what's available? No obligation at all.\nProspect: No, not interested.\nSDR (Alex): No worries at all. I appreciate your honesty. If you ever change your mind or have questions in the future, feel free to reach out. Have a great day! (bye)"
+    },
+    {
+      "scenario_id": "elderly_confused",
+      "name": "Elderly Confused Prospect",
+      "pipeline": "budget",
+      "turns": 8,
+      "duration_seconds": 4.3,
+      "avg_turn_latency_ms": 682.1,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Edna? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: *cup hand around ear* Eh?  Oh, hello... *lean in* I... think... you're... on... the... phone... *smile* I'm... Edna... *speak slowly* I'm... doing... all... right... thanks... for... asking... *strain to hear* What... can... I... do... for... you?\nSDR (Alex): Hi Edna, it's Alex from National Benefits Group. I'm so glad I caught up with you. I wanted to follow up on some information you looked into a while back regarding final expense insurance, or burial insurance. Do you remember looking into that?\nProspect: *cup hand around ear again* Oh, fi... nal... ex... pense... in... surance... *think for a moment* Ah, yes... *nod* I... think... I... do... re... mem... ber... *speak slowly* You... called... me... a... while... back... about... that... *lean in* I... was... in... ter... ested... in... learn... ing... more... *strain to hear* What... did... you... want... to... tell... me?\nSDR (Alex): I appreciate you taking the time to talk with me, Edna. I'm not trying to sell you anything, but I wanted to follow up on your interest in final expense insurance. Can you tell me a little bit about your current situation? Do you have any coverage in place right now?\nProspect: *strain to hear, leaning in closer* Oh, cov... erage... *think for a moment* Well... *speak slowly* I... do... have... some... life... in... surance... *pausing to collect thoughts* But... I'm... not... sure... if... it's... enough... *cup hand around ear again* My... husband... passed... away... a... few... years... ago... *pausing* And... I'm... not... sure... what... will... hap... pen... to... my... grave... site... and... oth... er... ex... pens... es... *speak slowly* I... want... to... make... sure... ev... ery... thing... is... tak... en... care... of... *looks concerned*\nSDR (Alex): I'm so sorry to hear about your loss, Edna. It's completely understandable that you're thinking about taking care of those final expenses. I can imagine it can be a bit overwhelming. \n\nYou mentioned you're not sure if your current life insurance is enough. That's a great point to review. And you're in your 70s, if I may ask, are you comfortable sharing your age range with me? It just helps our specialist get a better understanding of your situation. Also, how would you describe your general health? Just a simple \"good\" or \"fair\" is fine. And are you looking at a specific budget range for any additional coverage, perhaps $20-80 per month? \n\nIf you're open to it, I'd like to set up a quick call with one of our licensed specialists who can walk you through your options and answer any questions you may have. They can help you determine if your current coverage is sufficient or if there are other options that might be a better fit. Would you\nProspect: *strain to hear, leaning in closer* Oh, my... age... *think for a moment* I'm... 77... *speak slowly* Yes... I'm... com... for... ta... ble... shar... ing... that... *cup hand around ear again*\n\nMy... health... *pausing* I'd... say... fair... *speak slowly* I've... had... some... is... sues... with... my... heart... and... joints... *pausing*\n\nA... bud... get... *think for a moment* I'd... like... to... keep... it... un... der... $50... per... month... *speak slowly* If... pos... si... ble... *looks concerned*\n\nA... call... with... a... spe... cial... ist... *think for a moment* Yes... I'm... in... ter... ested... *nod* I'd... like... to... learn... more... about... my"
+    },
+    {
+      "scenario_id": "price_shopper",
+      "name": "Price Shopper",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this William? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "interruption_heavy",
+      "name": "Frequent Interrupter",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.5,
+      "avg_turn_latency_ms": 150.9,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Tony? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Yeah, it's Tony, what's up Alex? I'm doin' great, thanks for askin'. So, what's this about? You're from National Benefits Group, huh? Got a minute to chat? (talking quickly) I gotta make it quick, got a meeting in 20 minutes, but fire away, what's on your mind?"
+    }
+  ]
+}

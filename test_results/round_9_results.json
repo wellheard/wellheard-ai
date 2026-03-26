@@ -1,0 +1,156 @@
+{
+  "round": 9,
+  "timestamp": "2026-03-23T17:05:56.217758",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Margaret? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.5,
+      "avg_turn_latency_ms": 134.6,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Robert? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: (slowly and cautiously) Ah, who is this again? You say you're Alex from National Benefits Group? What's this about? I didn't call them, they didn't call me. How did you get my number? (pausing) I'm doing alright, I guess. But I'm not sure I want to talk to some stranger on the phone. What's this call about? You're not trying to sell me something, are ya?"
+    },
+    {
+      "scenario_id": "not_interested",
+      "name": "Not Interested - Soft Close Needed",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Dorothy? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "callback_hold",
+      "name": "Callback Request / Busy Prospect",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this James? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "voicemail",
+      "name": "Voicemail \u2014 Leave Message",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Patricia? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "already_covered",
+      "name": "Already Has Coverage",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.4,
+      "avg_turn_latency_ms": 171.7,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Harold? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Hi Alex, this is Harold. I'm doing alright, thanks for asking. What can I help you with?"
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Frank? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "elderly_confused",
+      "name": "Elderly Confused Prospect",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.2,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Edna? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "price_shopper",
+      "name": "Price Shopper",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this William? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    },
+    {
+      "scenario_id": "interruption_heavy",
+      "name": "Frequent Interrupter",
+      "pipeline": "budget",
+      "turns": 1,
+      "duration_seconds": 0.1,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "unknown",
+      "qa_score": 0,
+      "qa_analysis": {
+        "overall_score": 0,
+        "error": "Failed to parse QA analysis"
+      },
+      "transcript": "SDR (Alex): Hi, is this Tony? Hey, this is Alex calling from National Benefits Group. How are you doing today?"
+    }
+  ]
+}

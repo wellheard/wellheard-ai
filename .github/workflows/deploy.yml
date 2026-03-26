@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════
+# WellHeard AI — CI/CD Pipeline
+# Runs tests → Builds → Deploys to Fly.io on push to main
+# ═══════════════════════════════════════════════════════════════════
+name: Test & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Step 1: Run Triple QA Tests ─────────────────────────────────
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: QA Level 1 — Unit Tests
+        run: pytest tests/test_qa1_unit.py -v --tb=short
+
+      - name: QA Level 2 — Integration Tests
+        run: pytest tests/test_qa2_integration.py -v --tb=short
+
+      - name: QA Level 3 — Benchmark Tests
+        run: pytest tests/test_qa3_benchmark.py -v -s --tb=short
+
+  # ── Step 2: Deploy to Fly.io ────────────────────────────────────
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Fly CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

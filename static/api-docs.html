@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WellHeard AI - API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #0f172a;
+            --teal: #06b6d4;
+            --purple: #8b5cf6;
+            --white: #f8fafc;
+            --green: #22c55e;
+            --dark-bg: #1e293b;
+            --gray-light: #e2e8f0;
+            --gray-medium: #94a3b8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--white);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: white;
+            border-bottom: 1px solid var(--gray-light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--navy);
+        }
+
+        .get-started-btn {
+            background: linear-gradient(135deg, var(--teal) 0%, var(--purple) 100%);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .get-started-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--navy);
+            color: white;
+            padding: 2rem 0;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .sidebar-section {
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-medium);
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--teal);
+            border-left-color: var(--teal);
+        }
+
+        .sidebar-link.active {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--teal);
+            border-left-color: var(--teal);
+            font-weight: 600;
+        }
+
+        .sidebar-link.sub-link {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 3rem 4rem;
+            max-width: 900px;
+            background: var(--white);
+        }
+
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 100px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--navy);
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--navy);
+            margin-bottom: 1rem;
+            margin-top: 2rem;
+            font-weight: 700;
+            border-bottom: 3px solid var(--teal);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            color: var(--navy);
+            margin: 1.5rem 0 0.75rem 0;
+            font-weight: 700;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: var(--navy);
+            margin: 1rem 0 0.5rem 0;
+            font-weight: 700;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #475569;
+            line-height: 1.8;
+        }
+
+        a {
+            color: var(--teal);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Code Blocks */
+        .code-block-wrapper {
+            position: relative;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--dark-bg);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .code-language {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .copy-btn {
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #0891b2;
+        }
+
+        .copy-btn.copied {
+            background: var(--green);
+        }
+
+        pre {
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #e2e8f0;
+        }
+
+        code {
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Syntax Highlighting */
+        .json-key {
+            color: var(--teal);
+        }
+
+        .json-string {
+            color: var(--green);
+        }
+
+        .json-number {
+            color: var(--purple);
+        }
+
+        .json-boolean {
+            color: #f59e0b;
+        }
+
+        .json-null {
+            color: #ec4899;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--navy);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .field-required {
+            background: #fecaca;
+            color: #7f1d1d;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .field-optional {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .field-type {
+            color: var(--purple);
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Callouts */
+        .callout {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .callout.info {
+            background: #eff6ff;
+            border-left-color: var(--teal);
+            color: #0c4a6e;
+        }
+
+        .callout.warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #78350f;
+        }
+
+        .callout.success {
+            background: #dcfce7;
+            border-left-color: var(--green);
+            color: #166534;
+        }
+
+        .callout strong {
+            font-weight: 700;
+        }
+
+        /* Inline Code */
+        p code, li code {
+            background: #f1f5f9;
+            color: var(--navy);
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: #475569;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--navy);
+            color: white;
+            padding: 2rem 4rem;
+            text-align: center;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 4rem;
+        }
+
+        footer a {
+            color: var(--teal);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+                height: auto;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                border-right: none;
+                border-bottom: 1px solid var(--gray-light);
+                padding: 0;
+            }
+
+            .sidebar.open {
+                max-height: 500px;
+                padding: 1rem 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            header {
+                padding: 1rem 1.5rem;
+            }
+
+            footer {
+                padding: 1.5rem;
+            }
+
+            .code-block-wrapper {
+                margin: 1rem 0;
+            }
+
+            pre {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Utility */
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--teal);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            margin: 1rem 0;
+        }
+
+        .flow-diagram {
+            background: #f1f5f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--gray-light);
+            margin: 1.5rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--navy);
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-logo">WellHeard AI</div>
+        <div class="header-right">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <a href="#connect" class="get-started-btn">Get Started</a>
+        </div>
+    </header>
+
+    <!-- Layout -->
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Getting Started</div>
+                <a href="#introduction" class="sidebar-link" data-section="introduction">Introduction</a>
+                <a href="#authentication" class="sidebar-link" data-section="authentication">Authentication</a>
+                <a href="#websocket" class="sidebar-link" data-section="websocket">WebSocket Connection</a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Integration</div>
+                <a href="#connect" class="sidebar-link" data-section="connect">Step 1: Connect & Start</a>
+                <a href="#data-fetch" class="sidebar-link sub-link" data-section="data-fetch">Step 2: Data Fetch</a>
+                <a href="#audio-streaming" class="sidebar-link sub-link" data-section="audio-streaming">Step 3: Audio Streaming</a>
+                <a href="#call-events" class="sidebar-link sub-link" data-section="call-events">Step 4: Call Events</a>
+                <a href="#webhook" class="sidebar-link sub-link" data-section="webhook">Step 5: Post-Call Webhook</a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Reference</div>
+                <a href="#field-reference" class="sidebar-link" data-section="field-reference">Field Reference</a>
+                <a href="#merge-fields" class="sidebar-link" data-section="merge-fields">Merge Fields</a>
+                <a href="#examples" class="sidebar-link" data-section="examples">Code Examples</a>
+                <a href="#errors" class="sidebar-link" data-section="errors">Error Handling</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Introduction -->
+            <section id="introduction" data-section="introduction">
+                <h1>WellHeard AI API Documentation</h1>
+                <p>Welcome to WellHeard AI, a WebSocket-based voice AI API for telephony partners. Connect your phone system, stream audio bidirectionally, and let our AI handle conversations — from insurance SDR calls to healthcare intake, collections, and more.</p>
+
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Real-time bidirectional audio</strong> — Stream mulaw-encoded audio both ways</li>
+                    <li><strong>Intelligent call handling</strong> — Voicemail detection, warm transfers, and more</li>
+                    <li><strong>Flexible data integration</strong> — Pull lead data from your systems on demand</li>
+                    <li><strong>Merge fields</strong> — Personalize AI responses with dynamic customer data</li>
+                    <li><strong>Webhook notifications</strong> — Receive call results and transcripts post-call</li>
+                </ul>
+
+                <h3>Base URLs</h3>
+                <div class="callout info">
+                    <strong>WebSocket:</strong> <code>wss://wellheard.ai/v1/partner/audio</code><br>
+                    <strong>Dashboard:</strong> <code>https://wellheard.ai/v1/agent/dashboard</code>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section id="authentication" data-section="authentication">
+                <h2>Authentication</h2>
+                <p>WellHeard AI uses API keys for authentication. Pass your API key in the WebSocket connection URL as a query parameter or in the start event.</p>
+
+                <h3>Query Parameter</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">URL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre>wss://wellheard.ai/v1/partner/audio?api_key=YOUR_API_KEY</pre>
+                </div>
+
+                <div class="callout warning">
+                    <strong>Security:</strong> Always use <code>wss://</code> (WebSocket Secure). Never transmit API keys over unencrypted connections. Treat your API key like a password — do not commit it to version control.
+                </div>
+
+                <p>You can find your API key in your <a href="https://wellheard.ai/v1/agent/dashboard">WellHeard dashboard</a>.</p>
+            </section>
+
+            <!-- WebSocket Connection -->
+            <section id="websocket" data-section="websocket">
+                <h2>WebSocket Connection</h2>
+                <p>The WellHeard API uses WebSocket for low-latency, bidirectional communication with strict audio specifications.</p>
+
+                <h3>Connection Specifications</h3>
+                <table>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Protocol</strong></td>
+                        <td><code>wss://</code></td>
+                        <td>WebSocket Secure (encrypted)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Audio Codec</strong></td>
+                        <td><code>mulaw</code></td>
+                        <td>G.711 μ-law compression</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sample Rate</strong></td>
+                        <td><code>8000 Hz</code></td>
+                        <td>Standard telephony rate</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Channels</strong></td>
+                        <td><code>mono</code></td>
+                        <td>Single audio channel</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Frame Size</strong></td>
+                        <td><code>160 bytes</code></td>
+                        <td>Represents 20ms of audio (~50 frames/sec)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Message Order</strong></td>
+                        <td>JSON first</td>
+                        <td>Send start event as JSON, then binary audio</td>
+                    </tr>
+                </table>
+
+                <div class="callout info">
+                    <strong>Audio Format:</strong> Raw mulaw frames (160 bytes each). After the initial JSON start event, all audio is sent as binary data. JSON events (transfer, end, etc.) may be interspersed with audio.
+                </div>
+            </section>
+
+            <!-- Step 1: Connect & Start -->
+            <section id="connect" data-section="connect">
+                <h2>Step 1: Connect & Send Start Event</h2>
+                <p>Begin the call by opening a WebSocket connection and immediately sending a JSON start event. This event contains all lead information, configuration, and callback URLs.</p>
+
+                <h3>Start Event</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"start"</span>,
+  <span class="json-key">"call_id"</span>: <span class="json-string">"your-unique-call-id"</span>,
+  <span class="json-key">"direction"</span>: <span class="json-string">"outbound"</span>,
+  <span class="json-key">"phone_number"</span>: <span class="json-string">"+16135551234"</span>,
+  <span class="json-key">"first_name"</span>: <span class="json-string">"John"</span>,
+  <span class="json-key">"last_name"</span>: <span class="json-string">"Smith"</span>,
+  <span class="json-key">"full_name"</span>: <span class="json-string">"John Smith"</span>,
+  <span class="json-key">"email"</span>: <span class="json-string">"john@example.com"</span>,
+  <span class="json-key">"birth_date"</span>: <span class="json-string">"1955-03-15"</span>,
+  <span class="json-key">"state"</span>: <span class="json-string">"Florida"</span>,
+  <span class="json-key">"city"</span>: <span class="json-string">"Tampa"</span>,
+  <span class="json-key">"zip_code"</span>: <span class="json-string">"33601"</span>,
+  <span class="json-key">"data_url"</span>: <span class="json-string">"https://your-api.com/calls/{call_id}/data"</span>,
+  <span class="json-key">"data_api_key"</span>: <span class="json-string">"your-api-key"</span>,
+  <span class="json-key">"webhook_url"</span>: <span class="json-string">"https://your-api.com/calls/webhook"</span>,
+  <span class="json-key">"codec"</span>: <span class="json-string">"mulaw"</span>,
+  <span class="json-key">"sample_rate"</span>: <span class="json-number">8000</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h3>Start Event Field Reference</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Field</th>
+                            <th style="width: 80px;">Required</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>event</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Must be <code>"start"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>call_id</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Your unique call identifier. Used in data_url and returned in webhook</td>
+                        </tr>
+                        <tr>
+                            <td><code>direction</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td><code>outbound</code> or <code>inbound</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>phone_number</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>E.164 format (e.g., <code>+16135551234</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>first_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Prospect's first name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>last_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Prospect's last name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>full_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Full name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Email address. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>birth_date</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>ISO 8601 format (YYYY-MM-DD). Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>state</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>US state. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>city</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>City name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>zip_code</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Postal code. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>data_url</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>URL to fetch additional lead data. WellHeard will make a GET request</td>
+                        </tr>
+                        <tr>
+                            <td><code>data_api_key</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Auth header sent as <code>Bearer {data_api_key}</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>webhook_url</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>URL to POST call results when the call ends</td>
+                        </tr>
+                        <tr>
+                            <td><code>codec</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Audio codec. Default: <code>mulaw</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>sample_rate</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">number</span></td>
+                            <td>Sample rate in Hz. Default: <code>8000</code></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="callout success">
+                    <strong>Custom Fields:</strong> Any additional key-value pairs in the start event are accepted as custom fields and become available as merge variables in your AI script.
+                </div>
+            </section>
+
+            <!-- Step 2: Data Fetch -->
+            <section id="data-fetch" data-section="data-fetch">
+                <h2>Step 2: Data Fetch (Pull-Based)</h2>
+                <p>If you provided a <code>data_url</code> in the start event, WellHeard will immediately make a GET request to fetch additional lead data before starting the audio stream.</p>
+
+                <h3>Data Fetch Request</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">HTTP</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">GET</span> https://your-api.com/calls/<span class="json-string">{call_id}</span>/data
+<span class="json-key">Authorization</span>: <span class="json-string">Bearer</span> <span class="json-string">{data_api_key}</span></pre>
+                </div>
+
+                <h3>Data Fetch Response</h3>
+                <p>Your endpoint should return a JSON object with any key-value pairs. All fields are merged with the start event fields and become available as merge variables for your AI script.</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"insurance_type"</span>: <span class="json-string">"health"</span>,
+  <span class="json-key">"coverage_amount"</span>: <span class="json-string">"$50,000"</span>,
+  <span class="json-key">"policy_status"</span>: <span class="json-string">"active"</span>,
+  <span class="json-key">"last_premium_paid"</span>: <span class="json-string">"2024-01-15"</span>,
+  <span class="json-key">"delinquent_days"</span>: <span class="json-number">45</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <div class="callout info">
+                    <strong>Merge Behavior:</strong> Fields from data_url response are merged with start event fields. If both contain the same key, the data_url value takes precedence. All merged fields are available for use in merge field templates.
+                </div>
+
+                <h3>Implementation Notes</h3>
+                <ul>
+                    <li>WellHeard waits up to 5 seconds for your data_url response</li>
+                    <li>If your endpoint returns a 4xx error, the call proceeds with only start event data</li>
+                    <li>Response must be valid JSON object (not an array or primitive)</li>
+                    <li>Use <code>{call_id}</code> placeholder in your data_url — WellHeard replaces it with the actual call_id</li>
+                </ul>
+            </section>
+
+            <!-- Step 3: Audio Streaming -->
+            <section id="audio-streaming" data-section="audio-streaming">
+                <h2>Step 3: Audio Streaming</h2>
+                <p>After receiving the <code>ready</code> event from WellHeard, begin streaming audio bidirectionally. Raw mulaw frames are sent both ways with no JSON wrapping.</p>
+
+                <h3>Ready Event</h3>
+                <p>When WellHeard is ready to receive audio, it sends a ready event with session metadata:</p>
+
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"ready"</span>,
+  <span class="json-key">"call_id"</span>: <span class="json-string">"partner-xxx"</span>,
+  <span class="json-key">"session_id"</span>: <span class="json-string">"partner-xxx"</span>,
+  <span class="json-key">"setup_ms"</span>: <span class="json-number">1250.3</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h3>Audio Stream Flow</h3>
+                <div class="flow-diagram">
+You → WellHeard:   Raw mulaw frames (160 bytes) at ~50 frames/sec
+WellHeard → You:   Raw mulaw frames (160 bytes) when AI is speaking
+
+No JSON wrapping. Binary data only.
+                </div>
+
+                <h3>Audio Frame Details</h3>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>Frame Size</td>
+                        <td>160 bytes</td>
+                        <td>Exactly 160 bytes per frame</td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td>
+                        <td>20 milliseconds</td>
+                        <td>160 samples at 8000 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>Frequency</td>
+                        <td>~50 frames/second</td>
+                        <td>Send frames at regular 20ms intervals</td>
+                    </tr>
+                    <tr>
+                        <td>Format</td>
+                        <td>Binary mulaw</td>
+                        <td>G.711 μ-law compressed audio</td>
+                    </tr>
+                    <tr>
+                        <td>Channels</td>
+                        <td>Mono</td>
+                        <td>Single channel only</td>
+                    </tr>
+                </table>
+
+                <div class="callout warning">
+                    <strong>Frame Synchronization:</strong> Send frames at consistent 20ms intervals. Use timers or callbacks from your audio device to maintain proper pacing. Irregular timing can cause audio artifacts.
+                </div>
+
+                <h3>Audio Streaming Example (Conceptual)</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">Pseudocode</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">// On ready event:</span>
+startAudioStream()
+
+<span class="json-key">// Every 20ms, get audio from call:</span>
+audioChunk = phoneDevice.getAudio(160)  <span class="json-key">// 160 bytes of mulaw</span>
+ws.send(audioChunk)                     <span class="json-key">// Send as binary</span>
+
+<span class="json-key">// When receiving from WebSocket:</span>
+ws.on('message', (data) => {
+  <span class="json-key">if</span> (data <span class="json-key">instanceof</span> ArrayBuffer) {
+    <span class="json-key">// Raw audio frame from WellHeard AI</span>
+    phoneDevice.playAudio(data)
+  } <span class="json-key">else</span> {
+    <span class="json-key">// JSON event</span>
+    handleEvent(JSON.parse(data))
+  }
+})</pre>
+                </div>
+            </section>
+
+            <!-- Step 4: Call Events -->
+            <section id="call-events" data-section="call-events">
+                <h2>Step 4: Call Events</h2>
+                <p>During and after the call, WellHeard sends real-time event notifications. You can also send events to WellHeard to control the call.</p>
+
+                <h3>Events from WellHeard</h3>
+
+                <h4>voicemail_detected</h4>
+                <p>Sent when WellHeard detects voicemail (continuous audio >5 seconds at call start).</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"voicemail_detected"</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h4>transfer</h4>
+                <p>Sent when the AI decides to transfer the call to a human agent (warm transfer).</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"transfer"</span>,
+  <span class="json-key">"target"</span>: <span class="json-string">"+19048404634"</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h4>end</h4>
+                <p>Sent when the AI ends the conversation or the call is terminated.</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"end"</span>,
+  <span class="json-key">"reason"</span>: <span class="json-string">"completed"</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h3>Events You Can Send to WellHeard</h3>
+
+                <h4>stop</h4>
+                <p>Terminate the call immediately.</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"stop"</span>,
+  <span class="json-key">"reason"</span>: <span class="json-string">"hangup"</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h4>dtmf</h4>
+                <p>Send a DTMF (Dual-Tone Multi-Frequency) digit to the phone system.</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"event"</span>: <span class="json-string">"dtmf"</span>,
+  <span class="json-key">"digit"</span>: <span class="json-string">"1"</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <div class="callout info">
+                    <strong>DTMF Digits:</strong> Valid values are <code>0-9</code>, <code>*</code>, <code>#</code>, and <code>A-D</code>.
+                </div>
+            </section>
+
+            <!-- Step 5: Webhook -->
+            <section id="webhook" data-section="webhook">
+                <h2>Step 5: Post-Call Webhook</h2>
+                <p>When the call ends, WellHeard POSTs the complete call results and transcript to your webhook URL (if provided in the start event).</p>
+
+                <h3>Webhook Request</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">HTTP</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">POST</span> {webhook_url}
+<span class="json-key">Content-Type</span>: application/json
+<span class="json-key">Authorization</span>: <span class="json-string">Bearer</span> <span class="json-string">{data_api_key}</span></pre>
+                </div>
+
+                <h3>Webhook Payload</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JSON</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{</span>
+  <span class="json-key">"call_id"</span>: <span class="json-string">"your-unique-call-id"</span>,
+  <span class="json-key">"wellheard_call_id"</span>: <span class="json-string">"partner-your-unique-call-id"</span>,
+  <span class="json-key">"duration_seconds"</span>: <span class="json-number">127.3</span>,
+  <span class="json-key">"disposition"</span>: <span class="json-string">"transfer_completed"</span>,
+  <span class="json-key">"transcript"</span>: [
+    {
+      <span class="json-key">"role"</span>: <span class="json-string">"agent"</span>,
+      <span class="json-key">"text"</span>: <span class="json-string">"Hi John, this is Sarah calling about your insurance coverage..."</span>
+    },
+    {
+      <span class="json-key">"role"</span>: <span class="json-string">"prospect"</span>,
+      <span class="json-key">"text"</span>: <span class="json-string">"Yeah, who's this?"</span>
+    }
+  ],
+  <span class="json-key">"turns"</span>: <span class="json-number">8</span>,
+  <span class="json-key">"transfer_initiated"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"voicemail_detected"</span>: <span class="json-boolean">false</span>
+<span class="json-key">}</span></pre>
+                </div>
+
+                <h3>Webhook Field Reference</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>call_id</code></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Your original call_id from the start event</td>
+                        </tr>
+                        <tr>
+                            <td><code>wellheard_call_id</code></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>WellHeard's internal call identifier</td>
+                        </tr>
+                        <tr>
+                            <td><code>duration_seconds</code></td>
+                            <td><span class="field-type">number</span></td>
+                            <td>Total call duration in seconds</td>
+                        </tr>
+                        <tr>
+                            <td><code>disposition</code></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Call outcome. See disposition values below</td>
+                        </tr>
+                        <tr>
+                            <td><code>transcript</code></td>
+                            <td><span class="field-type">array</span></td>
+                            <td>Array of conversation turns with role (agent/prospect) and text</td>
+                        </tr>
+                        <tr>
+                            <td><code>turns</code></td>
+                            <td><span class="field-type">number</span></td>
+                            <td>Number of back-and-forth turns in the conversation</td>
+                        </tr>
+                        <tr>
+                            <td><code>transfer_initiated</code></td>
+                            <td><span class="field-type">boolean</span></td>
+                            <td>Whether a transfer to an agent was initiated</td>
+                        </tr>
+                        <tr>
+                            <td><code>voicemail_detected</code></td>
+                            <td><span class="field-type">boolean</span></td>
+                            <td>Whether voicemail was detected at call start</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h3>Disposition Values</h3>
+                <table>
+                    <tr>
+                        <th>Disposition</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>transfer_completed</code></td>
+                        <td>Call was transferred to a human agent and connected</td>
+                    </tr>
+                    <tr>
+                        <td><code>completed</code></td>
+                        <td>Call completed successfully with AI handling the entire interaction</td>
+                    </tr>
+                    <tr>
+                        <td><code>voicemail</code></td>
+                        <td>Voicemail was detected and AI left a message</td>
+                    </tr>
+                    <tr>
+                        <td><code>no_answer</code></td>
+                        <td>Call went unanswered or timed out</td>
+                    </tr>
+                    <tr>
+                        <td><code>hung_up</code></td>
+                        <td>Prospect hung up during the call</td>
+                    </tr>
+                </table>
+
+                <div class="callout success">
+                    <strong>Webhook Retry:</strong> WellHeard will retry failed webhooks with exponential backoff up to 3 times. Return a 2xx status code to acknowledge receipt.
+                </div>
+            </section>
+
+            <!-- Field Reference -->
+            <section id="field-reference" data-section="field-reference">
+                <h2>Field Reference</h2>
+                <p>Complete list of all fields supported in the start event. Any additional custom fields are also accepted and available as merge variables.</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Field Name</th>
+                            <th style="width: 80px;">Required</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><code>event</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Must be <code>"start"</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>call_id</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Unique call identifier. Alphanumeric, 1-64 characters</td>
+                        </tr>
+                        <tr>
+                            <td><code>direction</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td><code>outbound</code> or <code>inbound</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>phone_number</code></td>
+                            <td><span class="field-required">Yes</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>E.164 format with country code (e.g., <code>+16135551234</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><code>first_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Prospect's first name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>last_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Prospect's last name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>full_name</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Complete name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>email</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Email address. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>birth_date</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>ISO 8601 date (YYYY-MM-DD). Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>state</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>US state abbreviation or full name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>city</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>City name. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>zip_code</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Postal code. Available as merge field</td>
+                        </tr>
+                        <tr>
+                            <td><code>data_url</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>HTTPS endpoint to fetch additional lead data. Use <code>{call_id}</code> placeholder</td>
+                        </tr>
+                        <tr>
+                            <td><code>data_api_key</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Bearer token for authenticating data_url and webhook requests</td>
+                        </tr>
+                        <tr>
+                            <td><code>webhook_url</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>HTTPS endpoint to POST call results</td>
+                        </tr>
+                        <tr>
+                            <td><code>codec</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">string</span></td>
+                            <td>Audio codec. Default: <code>mulaw</code>. Only <code>mulaw</code> supported</td>
+                        </tr>
+                        <tr>
+                            <td><code>sample_rate</code></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">number</span></td>
+                            <td>Sample rate in Hz. Default: <code>8000</code>. Only <code>8000</code> supported</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Custom Fields</strong></td>
+                            <td><span class="field-optional">No</span></td>
+                            <td><span class="field-type">any</span></td>
+                            <td>Any additional fields are accepted and available as merge variables</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Merge Fields -->
+            <section id="merge-fields" data-section="merge-fields">
+                <h2>Merge Fields</h2>
+                <p>All lead data (from the start event and data_url response) can be used as merge variables in your AI script, greeting, FAQ, and other text fields. Use double curly braces to reference a field.</p>
+
+                <h3>Merge Field Syntax</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">Template</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">{{field_name}}</span>
+<span class="json-key">{{Field Name}}</span>  <span class="json-key">// Case-insensitive</span>
+<span class="json-key">{field_name}</span>      <span class="json-key">// Single braces also work</span></pre>
+                </div>
+
+                <h3>Examples</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">Text</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-string">"Hi {{first_name}}, this is Sarah calling about your {{insurance_type}} coverage"</span>
+<span class="json-string">"We see you're in {{state}} with a {{coverage_amount}} policy"</span>
+<span class="json-string">"Your policy expires on {{expiration_date}}"</span></pre>
+                </div>
+
+                <h3>Field Matching Rules</h3>
+                <ul>
+                    <li><strong>Case-insensitive:</strong> <code>{{first_name}}</code>, <code>{{First Name}}</code>, and <code>{{FIRST_NAME}}</code> all resolve to the same field</li>
+                    <li><strong>Underscores and spaces:</strong> <code>{{first_name}}</code> and <code>{{first name}}</code> are equivalent</li>
+                    <li><strong>Custom fields:</strong> Any field in your start event or data_url response can be used</li>
+                    <li><strong>Missing fields:</strong> If a field is not provided, it's replaced with an empty string</li>
+                    <li><strong>Escaping:</strong> Use <code>{{field_name}}</code> or <code>{field_name}</code> (single braces)</li>
+                </ul>
+
+                <h3>Common Merge Variables</h3>
+                <table>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>{{first_name}}</code></td>
+                        <td>Prospect's first name</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{last_name}}</code></td>
+                        <td>Prospect's last name</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{full_name}}</code></td>
+                        <td>Full name</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{email}}</code></td>
+                        <td>Email address</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{phone_number}}</code></td>
+                        <td>Phone number</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{state}}</code></td>
+                        <td>State</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{city}}</code></td>
+                        <td>City</td>
+                    </tr>
+                    <tr>
+                        <td><code>{{zip_code}}</code></td>
+                        <td>Postal code</td>
+                    </tr>
+                </table>
+
+                <div class="callout info">
+                    <strong>Custom Data:</strong> If you include custom fields in the start event or fetch them via data_url (e.g., <code>insurance_type</code>, <code>coverage_amount</code>), they're instantly available as merge variables.
+                </div>
+            </section>
+
+            <!-- Code Examples -->
+            <section id="examples" data-section="examples">
+                <h2>Code Examples</h2>
+                <p>Complete, production-ready examples for connecting to the WellHeard API in different languages.</p>
+
+                <h3>Node.js / JavaScript</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">const</span> WebSocket = <span class="json-key">require</span>(<span class="json-string">'ws'</span>);
+
+<span class="json-key">const</span> ws = <span class="json-key">new</span> WebSocket(
+  <span class="json-string">'wss://wellheard.ai/v1/partner/audio?api_key=YOUR_API_KEY'</span>
+);
+
+ws.<span class="json-key">on</span>(<span class="json-string">'open'</span>, () => {
+  <span class="json-key">const</span> startEvent = {
+    event: <span class="json-string">'start'</span>,
+    call_id: <span class="json-string">'call-'</span> + Date.now(),
+    direction: <span class="json-string">'outbound'</span>,
+    phone_number: <span class="json-string">'+16135551234'</span>,
+    first_name: <span class="json-string">'John'</span>,
+    last_name: <span class="json-string">'Smith'</span>,
+    state: <span class="json-string">'Florida'</span>,
+    data_url: <span class="json-string">'https://your-api.com/calls/{call_id}/data'</span>,
+    webhook_url: <span class="json-string">'https://your-api.com/calls/webhook'</span>
+  };
+
+  ws.<span class="json-key">send</span>(JSON.<span class="json-key">stringify</span>(startEvent));
+});
+
+ws.<span class="json-key">on</span>(<span class="json-string">'message'</span>, (data, isBinary) => {
+  <span class="json-key">if</span> (isBinary) {
+    <span class="json-key">// Binary audio frame from WellHeard AI</span>
+    playAudioToCall(data);
+  } <span class="json-key">else</span> {
+    <span class="json-key">const</span> msg = JSON.<span class="json-key">parse</span>(data.<span class="json-key">toString</span>());
+    console.<span class="json-key">log</span>(<span class="json-string">'Event:'</span>, msg);
+
+    <span class="json-key">switch</span> (msg.event) {
+      <span class="json-key">case</span> <span class="json-string">'ready'</span>:
+        startAudioStream(ws, phoneStream);
+        <span class="json-key">break</span>;
+      <span class="json-key">case</span> <span class="json-string">'transfer'</span>:
+        console.<span class="json-key">log</span>(<span class="json-string">'Transfer to:'</span>, msg.target);
+        bridgeCallToAgent(msg.target);
+        <span class="json-key">break</span>;
+      <span class="json-key">case</span> <span class="json-string">'voicemail_detected'</span>:
+        handleVoicemail();
+        <span class="json-key">break</span>;
+      <span class="json-key">case</span> <span class="json-string">'end'</span>:
+        cleanup();
+        <span class="json-key">break</span>;
+    }
+  }
+});
+
+ws.<span class="json-key">on</span>(<span class="json-string">'error'</span>, (err) => {
+  console.<span class="json-key">error</span>(<span class="json-string">'WebSocket error:'</span>, err);
+});
+
+ws.<span class="json-key">on</span>(<span class="json-string">'close'</span>, () => {
+  console.<span class="json-key">log</span>(<span class="json-string">'Connection closed'</span>);
+});
+
+<span class="json-key">function</span> startAudioStream(ws, phoneStream) {
+  phoneStream.<span class="json-key">on</span>(<span class="json-string">'data'</span>, (chunk) => {
+    ws.<span class="json-key">send</span>(chunk, { binary: <span class="json-boolean">true</span> });
+  });
+}</pre>
+                </div>
+
+                <h3>Python</h3>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">Python</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">import</span> asyncio
+<span class="json-key">import</span> websockets
+<span class="json-key">import</span> json
+<span class="json-key">import</span> time
+
+<span class="json-key">async</span> <span class="json-key">def</span> connect():
+    uri = <span class="json-string">"wss://wellheard.ai/v1/partner/audio?api_key=YOUR_API_KEY"</span>
+
+    <span class="json-key">async</span> <span class="json-key">with</span> websockets.<span class="json-key">connect</span>(uri) <span class="json-key">as</span> ws:
+        start_event = {
+            <span class="json-string">"event"</span>: <span class="json-string">"start"</span>,
+            <span class="json-string">"call_id"</span>: <span class="json-string">f"call-</span>{int(time.time())}<span class="json-string">"</span>,
+            <span class="json-string">"direction"</span>: <span class="json-string">"outbound"</span>,
+            <span class="json-string">"phone_number"</span>: <span class="json-string">"+16135551234"</span>,
+            <span class="json-string">"first_name"</span>: <span class="json-string">"John"</span>,
+            <span class="json-string">"state"</span>: <span class="json-string">"Florida"</span>,
+            <span class="json-string">"data_url"</span>: <span class="json-string">"https://your-api.com/calls/{call_id}/data"</span>,
+            <span class="json-string">"webhook_url"</span>: <span class="json-string">"https://your-api.com/calls/webhook"</span>
+        }
+
+        <span class="json-key">await</span> ws.<span class="json-key">send</span>(json.<span class="json-key">dumps</span>(start_event))
+
+        <span class="json-key">async</span> <span class="json-key">for</span> message <span class="json-key">in</span> ws:
+            <span class="json-key">if</span> isinstance(message, bytes):
+                <span class="json-key">await</span> play_audio(message)
+            <span class="json-key">else</span>:
+                event = json.<span class="json-key">loads</span>(message)
+                print(<span class="json-string">f"Event: </span>{event}<span class="json-string">"</span>)
+
+                <span class="json-key">if</span> event[<span class="json-string">"event"</span>] == <span class="json-string">"ready"</span>:
+                    asyncio.<span class="json-key">create_task</span>(stream_audio(ws))
+                <span class="json-key">elif</span> event[<span class="json-string">"event"</span>] == <span class="json-string">"transfer"</span>:
+                    bridge_call(event[<span class="json-string">"target"</span>])
+                <span class="json-key">elif</span> event[<span class="json-string">"event"</span>] == <span class="json-string">"end"</span>:
+                    <span class="json-key">break</span>
+
+asyncio.<span class="json-key">run</span>(connect())</pre>
+                </div>
+
+                <div class="callout info">
+                    <strong>Dependencies:</strong>
+                    <br>Node.js: <code>npm install ws</code>
+                    <br>Python: <code>pip install websockets</code>
+                </div>
+            </section>
+
+            <!-- Error Handling -->
+            <section id="errors" data-section="errors">
+                <h2>Error Handling</h2>
+                <p>Implement robust error handling to build a reliable integration.</p>
+
+                <h3>Connection Errors</h3>
+                <p>If your WebSocket connection is dropped, reconnect with exponential backoff.</p>
+                <div class="code-block-wrapper">
+                    <div class="code-header">
+                        <span class="code-language">JavaScript</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><span class="json-key">async</span> <span class="json-key">function</span> connectWithRetry(maxRetries = <span class="json-number">5</span>) {
+  <span class="json-key">let</span> retries = <span class="json-number">0</span>;
+
+  <span class="json-key">while</span> (retries < maxRetries) {
+    <span class="json-key">try</span> {
+      <span class="json-key">const</span> ws = <span class="json-key">new</span> WebSocket(
+        <span class="json-string">'wss://wellheard.ai/v1/partner/audio?api_key=YOUR_API_KEY'</span>
+      );
+      <span class="json-key">return</span> ws;
+    } <span class="json-key">catch</span> (err) {
+      <span class="json-key">const</span> backoff = Math.<span class="json-key">pow</span>(<span class="json-number">2</span>, retries) * <span class="json-number">1000</span>;
+      console.<span class="json-key">log</span>(<span class="json-string">f"Retry in </span>${backoff}ms<span class="json-string">"</span>);
+      <span class="json-key">await</span> <span class="json-key">new</span> Promise(<span class="json-key">resolve</span> =>
+        setTimeout(<span class="json-key">resolve</span>, backoff)
+      );
+      retries++;
+    }
+  }
+
+  <span class="json-key">throw</span> <span class="json-key">new</span> Error(<span class="json-string">'Max retries exceeded'</span>);
+}</pre>
+                </div>
+
+                <h3>Invalid Start Event</h3>
+                <p>If your start event has errors, the WebSocket connection will close with an error message. Ensure all required fields are present and correctly formatted.</p>
+
+                <h3>Audio Timeout</h3>
+                <p>If no audio is received for 30 seconds, the connection closes automatically. Keep sending audio frames at regular intervals.</p>
+
+                <h3>Rate Limiting</h3>
+                <table>
+                    <tr>
+                        <th>Limit</th>
+                        <th>Value</th>
+                        <th>Notes</th>
+                    </tr>
+                    <tr>
+                        <td>Concurrent Connections</td>
+                        <td>100 per API key</td>
+                        <td>Maximum simultaneous WebSocket connections</td>
+                    </tr>
+                    <tr>
+                        <td>Connection Duration</td>
+                        <td>Unlimited</td>
+                        <td>Individual calls can run as long as needed</td>
+                    </tr>
+                    <tr>
+                        <td>Message Frequency</td>
+                        <td>~50 audio frames/sec</td>
+                        <td>Audio must arrive at 20ms intervals</td>
+                    </tr>
+                </table>
+
+                <div class="callout warning">
+                    <strong>Graceful Degradation:</strong> If you exceed rate limits, new connections will be rejected. Monitor your concurrent connection count and implement a queue if needed.
+                </div>
+
+                <h3>Webhook Failures</h3>
+                <p>WellHeard will retry failed webhooks (4xx or 5xx errors) with exponential backoff:</p>
+                <ul>
+                    <li>Attempt 1: Immediate</li>
+                    <li>Attempt 2: 5 seconds</li>
+                    <li>Attempt 3: 25 seconds</li>
+                    <li>After 3 failed attempts, the webhook is dropped</li>
+                </ul>
+
+                <div class="callout success">
+                    <strong>Webhook Best Practices:</strong>
+                    <ul>
+                        <li>Return 2xx status immediately (before doing heavy processing)</li>
+                        <li>Use idempotency keys to handle duplicate deliveries</li>
+                        <li>Implement exponential backoff for retries</li>
+                        <li>Log all webhook deliveries for debugging</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Integration Flow Summary -->
+            <section id="flow" style="margin-top: 4rem;">
+                <h2>Integration Flow</h2>
+                <p>Here's the complete flow of a successful WellHeard call integration:</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tr>
+                            <th>Step</th>
+                            <th>Direction</th>
+                            <th>Content</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><strong>1</strong></td>
+                            <td>You → WellHeard</td>
+                            <td>WebSocket + JSON</td>
+                            <td>Open connection, send start event with call_id, customer data, and callback URLs</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2</strong></td>
+                            <td>WellHeard → Your API</td>
+                            <td>HTTP GET</td>
+                            <td><em>Optional:</em> WellHeard fetches lead data from your data_url</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td>You → WellHeard</td>
+                            <td>Binary Audio</td>
+                            <td>Stream mulaw frames from phone system (~50/sec, 160 bytes each)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3</strong></td>
+                            <td>WellHeard → You</td>
+                            <td>Binary Audio</td>
+                            <td>AI voice audio when the AI is speaking</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4</strong></td>
+                            <td>WellHeard → You</td>
+                            <td>JSON Events</td>
+                            <td>Real-time events: voicemail, transfer, end (interspersed with audio)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5</strong></td>
+                            <td>WellHeard → Your API</td>
+                            <td>HTTP POST</td>
+                            <td><em>Optional:</em> Call results, transcript, and disposition</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Get Support -->
+            <section id="support" style="margin-top: 4rem; padding: 2rem; background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%); border-radius: 8px; border: 2px solid var(--teal);">
+                <h2 style="border: none; color: var(--navy); margin-top: 0;">Need Help?</h2>
+                <p style="font-size: 1.05rem;">Have questions or need support? Reach out to our team:</p>
+                <ul style="margin-left: 0; list-style: none;">
+                    <li style="margin: 0.5rem 0;"><strong>Email:</strong> <a href="mailto:hello@wellheard.ai">hello@wellheard.ai</a></li>
+                    <li style="margin: 0.5rem 0;"><strong>Documentation:</strong> <a href="https://wellheard.ai/docs">wellheard.ai/docs</a></li>
+                    <li style="margin: 0.5rem 0;"><strong>Dashboard:</strong> <a href="https://wellheard.ai/v1/agent/dashboard">wellheard.ai/v1/agent/dashboard</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 WellHeard AI. All rights reserved. | <a href="mailto:hello@wellheard.ai">hello@wellheard.ai</a></p>
+    </footer>
+
+    <script>
+        // Intersection Observer for active sidebar link highlighting
+        const sections = document.querySelectorAll('section[data-section]');
+        const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.getAttribute('data-section');
+                    sidebarLinks.forEach(link => {
+                        if (link.getAttribute('data-section') === sectionId) {
+                            link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        }, {
+            threshold: 0.3,
+            rootMargin: '-100px 0px -66% 0px'
+        });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Smooth scroll for sidebar links
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                const section = document.querySelector(`[data-section="${sectionId}"]`);
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth' });
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('sidebar').classList.remove('open');
+                    }
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+        });
+
+        // Copy to clipboard functionality
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block-wrapper').querySelector('pre');
+            const text = codeBlock.innerText;
+
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                const isClickInsideSidebar = sidebar.contains(e.target);
+                const isClickOnToggle = menuToggle.contains(e.target);
+
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Highlight active link on page load based on scroll position
+        window.addEventListener('load', () => {
+            const scrollPosition = window.scrollY;
+            let activeSection = sections[0];
+
+            sections.forEach(section => {
+                if (section.offsetTop <= scrollPosition + 150) {
+                    activeSection = section;
+                }
+            });
+
+            const sectionId = activeSection.getAttribute('data-section');
+            sidebarLinks.forEach(link => {
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

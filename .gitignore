@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment & Secrets
+config/.env
+.env
+*.pem
+*.key
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Test / Cache
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Docker
+docker-compose.override.yml
+gcp-service-account.json

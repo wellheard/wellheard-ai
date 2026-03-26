@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# WellHeard AI — Google Cloud Build Configuration
+# Builds Docker image, pushes to Artifact Registry, and deploys to Cloud Run
+#
+# Project: heyvox-491318 (us-east1) — GCP project ID (immutable)
+# Service: wellheard-ai
+# Artifact Registry: us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai
+#
+# Trigger with:
+#   gcloud builds submit --config=cloudbuild.yaml
+# ═══════════════════════════════════════════════════════════════════════════
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:$SHORT_SHA'
+      - '-t'
+      - 'us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:latest'
+      - '-f'
+      - 'Dockerfile'
+      - '.'
+
+  # Step 2: Push to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - 'us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:$SHORT_SHA'
+    waitFor: ['build-image']
+
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gke-deploy'
+    id: 'deploy-cloudrun'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wellheard-ai'
+      - '--image=us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:$SHORT_SHA'
+      - '--region=us-east1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8000'
+      - '--concurrency=1'
+      - '--min-instances=1'
+      - '--max-instances=100'
+      - '--timeout=3600s'
+      - '--cpu=1'
+      - '--memory=512Mi'
+      - '--cpu-throttling=false'
+      - '--session-affinity'
+      - '--set-env-vars=HV_HOST=0.0.0.0,HV_PORT=8000,HV_DEBUG=false,HV_DEFAULT_PIPELINE=budget,HV_DEEPGRAM_STT_MODEL=nova-3,HV_DEEPGRAM_TTS_MODEL=aura-orpheus-en,HV_GROQ_MODEL=llama-3.3-70b-versatile,HV_GEMINI_MODEL=gemini-2.5-flash,HV_CARTESIA_MODEL=sonic-3,HV_CARTESIA_SPEED=1.0,HV_CARTESIA_EMOTION=positivity:medium,HV_TELEPHONY_PROVIDER=twilio'
+      - '--set-secrets=HV_API_KEY=HV_API_KEY:latest,HV_DEEPGRAM_API_KEY=HV_DEEPGRAM_API_KEY:latest,HV_GROQ_API_KEY=HV_GROQ_API_KEY:latest,HV_GOOGLE_API_KEY=HV_GOOGLE_API_KEY:latest,HV_CARTESIA_API_KEY=HV_CARTESIA_API_KEY:latest,HV_CARTESIA_VOICE_ID=HV_CARTESIA_VOICE_ID:latest,HV_TWILIO_ACCOUNT_SID=HV_TWILIO_ACCOUNT_SID:latest,HV_TWILIO_AUTH_TOKEN=HV_TWILIO_AUTH_TOKEN:latest,HV_TWILIO_API_KEY_SID=HV_TWILIO_API_KEY_SID:latest,HV_TWILIO_API_KEY_SECRET=HV_TWILIO_API_KEY_SECRET:latest,HV_TWILIO_PHONE_NUMBER=HV_TWILIO_PHONE_NUMBER:latest,HV_TELNYX_API_KEY=HV_TELNYX_API_KEY:latest,HV_TELNYX_SIP_USERNAME=HV_TELNYX_SIP_USERNAME:latest,HV_TELNYX_SIP_PASSWORD=HV_TELNYX_SIP_PASSWORD:latest,HV_TELNYX_CONNECTION_ID=HV_TELNYX_CONNECTION_ID:latest'
+    waitFor: ['push-image']
+
+images:
+  - 'us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:$SHORT_SHA'
+  - 'us-east1-docker.pkg.dev/heyvox-491318/wellheard/wellheard-ai:latest'
+
+# Build timeout: 1 hour (to account for long-running operations)
+timeout: '3600s'
+
+# Build logs retention
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'N1_HIGHCPU_8'
+
+# Substitutions for custom values
+substitutions:
+  _REGION: 'us-east1'
+  _SERVICE_NAME: 'wellheard-ai'
+  _ARTIFACT_REPO: 'wellheard'

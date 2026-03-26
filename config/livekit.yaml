@@ -1,0 +1,19 @@
+# LiveKit Server Configuration for WellHeard AI
+# Optimized for voice AI with low-latency audio routing
+
+port: 7880
+rtc:
+  port_range_start: 50000
+  port_range_end: 50060
+  use_external_ip: true
+  # Opus codec preferred for voice AI (low latency, adaptive bitrate)
+  # Disable video codecs to reduce overhead
+  congestion_control:
+    enabled: true
+
+logging:
+  level: info
+
+# SIP integration for Telnyx telephony
+sip:
+  enabled: true

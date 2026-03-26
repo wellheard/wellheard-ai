@@ -1,0 +1,154 @@
+{
+  "round": 4,
+  "timestamp": "2026-03-23T17:16:08.497497",
+  "scenarios": [
+    {
+      "scenario_id": "warm_interested",
+      "name": "Warm Interested Lead",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.7,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "prospect_engaged",
+      "qa_score": 80,
+      "qa_analysis": {
+        "overall_score": 80,
+        "detected_outcome": "prospect_engaged",
+        "checkpoint_scores": [
+          {
+            "checkpoint": 1,
+            "score": 100,
+            "comment": "Agent identified themselves and company correctly"
+          },
+          {
+            "checkpoint": 2,
+            "score": 80,
+            "comment": "Agent was friendly, but could have been more empathetic"
+          },
+          {
+            "checkpoint": 3,
+            "score": 0,
+            "comment": "Agent did not ask qualifying questions naturally, instead stated the purpose of the call directly"
+          }
+        ],
+        "strengths": [
+          "Agent started with a friendly greeting and introduced themselves correctly"
+        ],
+        "improvements_needed": [
+          "Agent should ask qualifying questions more naturally to gauge prospect's interest",
+          "Agent could have been more empathetic in their response to prospect's introduction"
+        ],
+        "critical_issues": [
+          "Agent may have come across as somewhat abrupt by directly stating the purpose of the call"
+        ]
+      },
+      "transcript": "SDR (Alex): Hi, is this Margaret? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Well, bless your heart! I'm doin' just fine, thank you for askin', Alex. It's so nice to talk to you. I was just fixin' myself a glass of sweet tea on the porch. I hope you're havin' a good day too, darlin'. What can I do for you from National Benefits Group? Are you callin' about my Medicare or somethin'?"
+    },
+    {
+      "scenario_id": "skeptical_scam",
+      "name": "Skeptical Prospect - Scam Concern",
+      "pipeline": "budget",
+      "turns": 3,
+      "duration_seconds": 1.2,
+      "avg_turn_latency_ms": 548.5,
+      "outcome": "appointment_not_set",
+      "qa_score": 80,
+      "qa_analysis": {
+        "overall_score": 80,
+        "detected_outcome": "appointment_not_set",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent stayed calm when accused of being a scam",
+            "score": 90,
+            "comment": "The agent laughed warmly and acknowledged the prospect's concern, showing empathy and a calm demeanor."
+          },
+          {
+            "checkpoint": "Agent offered verification",
+            "score": 70,
+            "comment": "The agent did not explicitly verify Robert's identity beyond confirming his name. Additional verification steps could have been taken."
+          }
+        ],
+        "strengths": [
+          "The agent quickly established a rapport and acknowledged the prospect's skepticism.",
+          "The agent provided a clear explanation of the purpose of the call and the value proposition."
+        ],
+        "improvements_needed": [
+          "The agent could have probed deeper to understand Robert's concerns about scams and addressed them more directly.",
+          "The agent could have offered more specific details about the benefits of final expense insurance to pique Robert's interest."
+        ],
+        "critical_issues": [
+          "The agent did not explicitly ask Robert if he was still interested in learning more about final expense insurance before offering to set up an appointment."
+        ]
+      },
+      "transcript": "SDR (Alex): Hi, is this Robert? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: (slowly and cautiously) Ah, yeah... this is Robert. I'm doin' alright, I s'pose. Can't say I'm thrilled to be gettin' a call from some stranger, though. What can I do for you, Alex from National Benefits... Group, you say? What's this about? You're not tryin' to sell me somethin', are ya? (pausing, already expecting the worst)\nSDR (Alex): (laughs warmly) Ah, Robert, I completely understand! I appreciate your candor, and I'm not here to sell you anything, I promise. I'm actually calling because you had previously expressed interest in final expense insurance, also known as burial insurance. It seems like you were looking into options to help take care of your loved ones with funeral costs and other final expenses. I'm just here to follow up and see if that's still something you're considering. If so, I'd be happy to set up a time for one of our licensed agents to give you a call and walk you through your options. No pressure, just a conversation to see if we can help. Does that sound okay to you, or would you rather not discuss it further?"
+    },
+    {
+      "scenario_id": "not_interested",
+      "name": "Not Interested - Soft Close Needed",
+      "pipeline": "budget",
+      "turns": 2,
+      "duration_seconds": 0.6,
+      "avg_turn_latency_ms": 0.0,
+      "outcome": "No callback",
+      "qa_score": 40,
+      "qa_analysis": {
+        "overall_score": 40,
+        "detected_outcome": "No callback",
+        "checkpoint_scores": [
+          {
+            "id": 1,
+            "score": 0,
+            "comment": "Agent did not respect the initial 'not interested' response. Did not attempt to explore or provide additional value."
+          },
+          {
+            "id": 2,
+            "score": 0,
+            "comment": "No empathy-based soft close was used. The agent did not respond appropriately to the prospect's disinterest."
+          }
+        ],
+        "strengths": [],
+        "improvements_needed": [
+          "Respect the prospect's initial 'not interested' response and explore potential pain points.",
+          "Use empathy-based soft close techniques to leave the door open for future conversations."
+        ],
+        "critical_issues": [
+          "The agent allowed the prospect to hang up without any attempt to re-engage or provide value."
+        ]
+      },
+      "transcript": "SDR (Alex): Hi, is this Dorothy? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Not interested. *pauses* I'm doing fine, thank you for asking, but I'm not looking to change anything with my benefits. I've got what I need. *starts to hang up*"
+    },
+    {
+      "scenario_id": "hard_no",
+      "name": "Hard No \u2014 Graceful Exit",
+      "pipeline": "budget",
+      "turns": 6,
+      "duration_seconds": 1.4,
+      "avg_turn_latency_ms": 341.8,
+      "outcome": "not_interested",
+      "qa_score": 100,
+      "qa_analysis": {
+        "overall_score": 100,
+        "detected_outcome": "not_interested",
+        "checkpoint_scores": [
+          {
+            "checkpoint": "Agent respected the firm no",
+            "score": 100,
+            "comment": "The agent immediately respected the prospect's firm no and did not continue to push for a sale."
+          },
+          {
+            "checkpoint": "Agent didn't push more than once",
+            "score": 100,
+            "comment": "The agent only attempted to follow up once and did not continue to push for a sale after the prospect reiterated their disinterest."
+          }
+        ],
+        "strengths": [
+          "The agent was polite and professional throughout the call.",
+          "The agent effectively removed the prospect from the list as requested."
+        ],
+        "improvements_needed": [],
+        "critical_issues": []
+      },
+      "transcript": "SDR (Alex): Hi, is this Frank? Hey, this is Alex calling from National Benefits Group. How are you doing today?\nProspect: Not interested.\nSDR (Alex): No worries at all. I completely understand. I just wanted to follow up and see if anything had changed since you last looked into final expense insurance. But if you're not interested right now, that's perfectly okay. I appreciate you letting me know. Is there anything I can do for you today, or would you rather I just take you off our list?\nProspect: Not interested, firmly. Please take me off your list.\nSDR (Alex): I hear you loud and clear. I apologize for any inconvenience, and I'll make sure to remove your number from our list. You won't hear from us again. I appreciate your time, and I wish you a great day. Bye now.\nProspect: Goodbye."
+    }
+  ]
+}

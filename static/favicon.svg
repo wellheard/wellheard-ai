@@ -1,0 +1,50 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <style>
+      .favicon-shadow { filter: drop-shadow(0 1px 2px rgba(27, 79, 114, 0.2)); }
+    </style>
+
+    <!-- Gradient definitions -->
+    <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2E86C1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1B4F72;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="faviconRadial" cx="50%" cy="30%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#FFFFFF;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="url(#faviconGradient)" />
+
+  <!-- Glossy overlay -->
+  <rect width="32" height="32" rx="6" fill="url(#faviconRadial)" />
+
+  <!-- Microphone icon -->
+  <g class="favicon-shadow" transform="translate(16, 16)">
+    <!-- Capsule (microphone head) -->
+    <rect x="-3.5" y="-6" width="7" height="10" rx="1.5" fill="white" opacity="0.95" />
+
+    <!-- Capsule highlight -->
+    <rect x="-3" y="-5.5" width="2.5" height="9" rx="1" fill="white" opacity="0.4" />
+
+    <!-- Stand -->
+    <rect x="-1.5" y="4.5" width="3" height="4" rx="1" fill="white" opacity="0.9" />
+
+    <!-- Sound waves - simplified for favicon size -->
+    <g stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.75">
+      <!-- Inner wave arc -->
+      <path d="M -6.5 -1 Q -6.5 -4, -4.5 -4" />
+      <!-- Outer wave arc -->
+      <path d="M -8 0.5 Q -8 -5, -4 -5.5" />
+      <!-- Right side waves -->
+      <path d="M 6.5 -1 Q 6.5 -4, 4.5 -4" />
+      <path d="M 8 0.5 Q 8 -5, 4 -5.5" />
+    </g>
+  </g>
+
+  <!-- Subtle corner accent for visual interest at small size -->
+  <circle cx="26" cy="6" r="1.5" fill="white" opacity="0.5" />
+</svg>
