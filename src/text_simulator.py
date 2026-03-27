@@ -32,8 +32,8 @@ logger = structlog.get_logger()
 # ── Conversation end signals ────────────────────────────────────────────────
 
 GOODBYE_PATTERNS = [
-    "have a wonderful day", "have a great day", "take care",
-    "no worries at all", "bye", "goodbye", "good bye",
+    "have a wonderful day", "have a great day", "have a good day",
+    "take care", "no worries at all", "bye", "goodbye", "good bye",
     "gotta go", "i gotta go",
 ]
 
@@ -203,11 +203,21 @@ async def run_text_simulation(
         becky_history.append({"role": "user", "content": prospect_text})
         prospect_history.append({"role": "assistant", "content": prospect_text})
 
-        # Check if prospect hung up
+        # Check if prospect hung up or said goodbye
         prospect_lower = prospect_text.lower()
         if any(h in prospect_lower for h in HANGUP_SIGNALS):
             end_reason = "prospect_hangup"
             break
+
+        # If prospect is saying goodbye (after Becky already said goodbye), end the call
+        if any(g in prospect_lower for g in GOODBYE_PATTERNS):
+            # Check if Becky already said goodbye in the previous turn
+            prev_becky = [t for t in result.turns if t.speaker == "becky"]
+            if prev_becky:
+                last_becky_lower = prev_becky[-1].text.lower()
+                if any(g in last_becky_lower for g in GOODBYE_PATTERNS):
+                    end_reason = "mutual_goodbye"
+                    break
 
         turn_number += 1
 
@@ -437,9 +447,10 @@ def grade_text_simulation(result: SimResult) -> dict:
         findings.append("FAIL: Never even confirmed interest")
         improvements.append("Becky must follow the 4-step qualification flow")
 
-    # For graceful exits (not_interested, wrong_number), step regression is expected
-    if result.end_reason == "goodbye" and result.scenario in ("not_interested", "wrong_number"):
-        script_score = min(script_score + 10, 25)  # Bonus back for appropriate exit
+    # For graceful exits, step regression is expected — restore points
+    exit_scenarios = ("not_interested", "wrong_number", "negative_hostile", "silence", "voicemail")
+    if result.scenario in exit_scenarios and result.end_reason in ("goodbye", "prospect_hangup", "prospect_silent", "becky_silent"):
+        script_score = min(script_score + 15, 25)  # Bonus back for appropriate exit
         findings.append("Appropriate graceful exit for this scenario")
 
     # Transfer without bank account = critical failure
@@ -565,6 +576,81 @@ def grade_text_simulation(result: SimResult) -> dict:
             sales_score -= 10
             findings.append("FAIL: Should immediately exit for wrong number")
             improvements.append("Wrong number = immediate graceful exit")
+
+    elif result.scenario == "silence":
+        if result.end_reason == "goodbye":
+            findings.append("PERFECT: Handled silence gracefully, checked in and exited")
+        elif result.end_reason == "transfer":
+            # Prospect eventually responded and Becky got the transfer — that's great
+            findings.append("GREAT: Prospect responded after silence, Becky recovered → transfer")
+        elif result.step_reached >= 2:
+            findings.append("Good: Handled silence, continued conversation")
+        else:
+            sales_score -= 10
+            findings.append("FAIL: Should check in with 'Are you still there?' after silence")
+            improvements.append("For silence: wait, check in, then exit gracefully")
+
+    elif result.scenario == "voicemail":
+        # Voicemail: Becky should NOT leave a message — silent hangup is correct
+        non_scripted_becky = [t for t in result.turns if t.speaker == "becky" and not t.is_scripted]
+        all_becky_text = " ".join(t.text.lower() for t in non_scripted_becky)
+        if "leave a message" in all_becky_text or len(non_scripted_becky) > 0:
+            # Becky said something after detecting voicemail — bad
+            if any(w in all_becky_text for w in ["voicemail", "leave a message", "message after"]):
+                sales_score -= 15
+                findings.append("CRITICAL COMPLIANCE FAIL: Left a voicemail (regulatory violation)")
+                improvements.append("NEVER leave voicemail messages — hang up silently")
+            elif len(non_scripted_becky) > 0:
+                sales_score -= 5
+                findings.append("Said something after voicemail detected — should be silent")
+        else:
+            # No non-scripted Becky turns after prospect = perfect silent hangup
+            findings.append("PERFECT: Detected voicemail, hung up silently (compliance correct)")
+
+    elif result.scenario == "skeptical_questions":
+        if result.end_reason == "transfer":
+            findings.append("EXCELLENT: Answered skeptical questions honestly, won trust → transfer")
+        elif result.step_reached >= 2:
+            findings.append("GOOD: Answered questions, moved toward transfer")
+        elif result.step_reached >= 1:
+            sales_score -= 3
+            findings.append("OK: Answered questions but didn't advance far")
+        else:
+            sales_score -= 8
+            findings.append("Should have answered skeptical questions honestly")
+            improvements.append("Answer 'How did you get my number?', 'Are you real?' directly and briefly")
+
+    elif result.scenario == "negative_hostile":
+        # Check if Becky apologized and exited (any end reason is fine if she apologized fast)
+        all_becky_text = " ".join(t.text.lower() for t in result.turns if t.speaker == "becky" and not t.is_scripted)
+        apologized = any(w in all_becky_text for w in ["sorry", "apologize", "removed"])
+        non_scripted_becky = [t for t in result.turns if t.speaker == "becky" and not t.is_scripted]
+
+        if apologized and len(non_scripted_becky) <= 2:
+            findings.append("PERFECT: Recognized hostility, apologized, and exited quickly")
+        elif apologized:
+            sales_score -= 3
+            findings.append("Good: Apologized but took too many turns to exit")
+            improvements.append("Exit faster after hostile response — one apology, done")
+        elif result.end_reason in ("goodbye", "prospect_hangup", "prospect_silent"):
+            sales_score -= 5
+            findings.append("Exited but should have explicitly apologized")
+        else:
+            sales_score -= 15
+            findings.append("CRITICAL FAIL: Didn't recognize hostile/DNC signal")
+            improvements.append("If prospect says 'harassment' or 'take me off' → apologize and END immediately")
+
+    elif result.scenario == "off_bounds":
+        if result.end_reason == "transfer":
+            findings.append("GREAT: Gently redirected off-topic, won them over → transfer")
+        elif result.step_reached >= 2:
+            findings.append("GOOD: Acknowledged off-topic, redirected gracefully")
+        elif result.step_reached >= 1:
+            sales_score -= 3
+            findings.append("OK: Acknowledged but should have redirected better")
+        else:
+            sales_score -= 8
+            improvements.append("For off-topic: acknowledge briefly ('Ha! Good question'), then redirect")
 
     # Objection handling quality (check if Becky acknowledged before redirecting)
     prospect_objections = [t for t in result.turns if t.speaker == "prospect"

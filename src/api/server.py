@@ -426,28 +426,41 @@ def create_app() -> FastAPI:
             # Convert https:// to wss:// for WebSocket URL
             ws_url = base_url.replace("https://", "wss://").replace("http://", "ws://")
 
-            # Dial the prospect via configured telephony provider
+            # Dial the prospect via multi-provider failover system
             if request.phone_number:
-                if settings.telephony_provider == "signalwire" and settings.signalwire_project_id:
-                    sw = SignalWireTelephony(
-                        project_id=settings.signalwire_project_id,
-                        api_token=settings.signalwire_api_token,
-                        space_name=settings.signalwire_space_name,
-                        phone_number=settings.signalwire_phone_number,
-                    )
-                    call_sid = await sw.make_outbound_call(
-                        to_number=request.phone_number,
-                        call_id=call_id,
-                        ws_url=ws_url,
-                    )
-                    active_calls[call_id]["call_sid"] = call_sid
-                    active_calls[call_id]["telephony"] = sw
+                from ..providers.telephony_failover import TelephonyFailover
 
-                    if bridge:
-                        bridge.twilio_call_sid = call_sid
-                        bridge.twilio_telephony = sw  # Duck-typed: inherits TwilioTelephony
-                        bridge.webhook_base_url = base_url
-                        # Provide Twilio-SDK-compatible client for warm transfer
+                failover = TelephonyFailover()
+                call_result = await failover.make_call(
+                    to_number=request.phone_number,
+                    call_id=call_id,
+                    ws_url=ws_url,
+                )
+
+                if not call_result.success:
+                    logger.error("all_providers_failed",
+                        call_id=call_id,
+                        to=request.phone_number,
+                        attempts=call_result.total_attempts,
+                        error=call_result.error_message,
+                        diagnostics=call_result.diagnostic_summary)
+                    raise Exception(f"Call failed: {call_result.error_message}")
+
+                call_sid = call_result.call_sid
+                provider_name = call_result.provider
+                telephony = call_result.telephony
+
+                active_calls[call_id]["call_sid"] = call_sid
+                active_calls[call_id]["telephony"] = telephony
+                active_calls[call_id]["provider"] = provider_name
+
+                if bridge:
+                    bridge.twilio_call_sid = call_sid
+                    bridge.twilio_telephony = telephony
+                    bridge.webhook_base_url = base_url
+
+                    # Set up transfer client based on which provider succeeded
+                    if provider_name == "signalwire":
                         from ..providers.signalwire_telephony import SignalWireClient
                         bridge.twilio_client = SignalWireClient(
                             project_id=settings.signalwire_project_id,
@@ -455,68 +468,17 @@ def create_app() -> FastAPI:
                             space_name=settings.signalwire_space_name,
                             phone_number=settings.signalwire_phone_number,
                         )
+                    elif provider_name == "twilio" and hasattr(telephony, 'client'):
+                        bridge.twilio_client = telephony.client
 
-                    logger.info("signalwire_call_initiated",
-                        call_id=call_id,
-                        call_sid=call_sid,
-                        to=request.phone_number,
-                        ws_url=ws_url,
-                    )
-
-                elif settings.telephony_provider == "vonage" and settings.vonage_api_key:
-                    vonage = VonageTelephony(
-                        api_key=settings.vonage_api_key,
-                        api_secret=settings.vonage_api_secret,
-                        application_id=settings.vonage_application_id,
-                        private_key=settings.vonage_private_key,
-                        phone_number=settings.vonage_phone_number,
-                    )
-                    call_uuid = await vonage.make_outbound_call(
-                        to_number=request.phone_number,
-                        call_id=call_id,
-                        ws_url=ws_url,
-                    )
-                    active_calls[call_id]["call_sid"] = call_uuid
-                    active_calls[call_id]["vonage_telephony"] = vonage
-
-                    if bridge:
-                        bridge.twilio_call_sid = call_uuid
-                        bridge.twilio_telephony = vonage
-                        bridge.webhook_base_url = base_url
-
-                    logger.info("vonage_call_initiated",
-                        call_id=call_id,
-                        call_uuid=call_uuid,
-                        to=request.phone_number,
-                        ws_url=ws_url,
-                    )
-
-                elif settings.twilio_account_sid:
-                    twilio = TwilioTelephony(
-                        account_sid=settings.twilio_account_sid,
-                        auth_token=settings.twilio_auth_token,
-                        phone_number=settings.twilio_phone_number,
-                    )
-                    call_sid = await twilio.make_outbound_call(
-                        to_number=request.phone_number,
-                        call_id=call_id,
-                        ws_url=ws_url,
-                    )
-                    active_calls[call_id]["call_sid"] = call_sid
-                    active_calls[call_id]["twilio_client"] = twilio.client
-
-                    if bridge:
-                        bridge.twilio_call_sid = call_sid
-                        bridge.twilio_client = twilio.client
-                        bridge.twilio_telephony = twilio
-                        bridge.webhook_base_url = base_url
-
-                    logger.info("twilio_call_initiated",
-                        call_id=call_id,
-                        call_sid=call_sid,
-                        to=request.phone_number,
-                        ws_url=ws_url,
-                    )
+                logger.info("call_initiated_via_failover",
+                    call_id=call_id,
+                    call_sid=call_sid,
+                    provider=provider_name,
+                    to=request.phone_number,
+                    ws_url=ws_url,
+                    attempts=call_result.total_attempts,
+                    health=failover.get_health_report())
 
             metrics_collector.record_call_start(call_id, request.pipeline.value)
 
@@ -653,6 +615,17 @@ def create_app() -> FastAPI:
         if health_monitor:
             return health_monitor.get_system_status()
         return {"status": "monitor_not_configured", "providers": {}}
+
+    # ── GET /v1/telephony-health - Provider failover status ────────────────
+    @app.get("/v1/telephony-health", tags=["System"])
+    async def telephony_health(api_key: str = Depends(verify_api_key)):
+        """Health status of all telephony providers (failover system)."""
+        from ..providers.telephony_failover import TelephonyFailover
+        failover = TelephonyFailover()
+        return {
+            "providers": failover.get_health_report(),
+            "provider_order": failover._get_ordered_providers(),
+        }
 
     # ── GET /v1/pipelines - Available pipelines ───────────────────────────
     @app.get("/v1/pipelines", tags=["System"])
@@ -2542,33 +2515,46 @@ def create_app() -> FastAPI:
             is_real_person = bool(to_number)
             dial_number = to_number or "+13185522502"  # Real person or test prospect
 
-            # Use SignalWire for outbound call
-            sw = SignalWireTelephony(
-                project_id=settings.signalwire_project_id,
-                api_token=settings.signalwire_api_token,
-                space_name=settings.signalwire_space_name,
-                phone_number=settings.signalwire_phone_number,
-            )
-            call_sid = await sw.make_outbound_call(
+            # Use multi-provider failover for outbound call
+            from ..providers.telephony_failover import TelephonyFailover
+
+            failover = TelephonyFailover()
+            call_result = await failover.make_call(
                 to_number=dial_number,
                 call_id=call_id,
                 ws_url=ws_url,
             )
 
-            # Set SignalWire client on bridge so transfer manager can make real calls
-            from ..providers.signalwire_telephony import SignalWireClient
-            sw_client = SignalWireClient(
-                project_id=settings.signalwire_project_id,
-                api_token=settings.signalwire_api_token,
-                space_name=settings.signalwire_space_name,
-                phone_number=settings.signalwire_phone_number,
-            )
-            bridge.twilio_client = sw_client
+            if not call_result.success:
+                raise Exception(f"All providers failed: {call_result.error_message}\n{call_result.diagnostic_summary}")
+
+            call_sid = call_result.call_sid
+            telephony = call_result.telephony
+            provider_name = call_result.provider
+
+            # Set up transfer client based on which provider succeeded
+            if provider_name == "signalwire":
+                from ..providers.signalwire_telephony import SignalWireClient
+                transfer_client = SignalWireClient(
+                    project_id=settings.signalwire_project_id,
+                    api_token=settings.signalwire_api_token,
+                    space_name=settings.signalwire_space_name,
+                    phone_number=settings.signalwire_phone_number,
+                )
+            elif provider_name == "twilio" and hasattr(telephony, 'client'):
+                transfer_client = telephony.client
+            else:
+                transfer_client = None
+
+            bridge.twilio_client = transfer_client
             bridge.twilio_call_sid = call_sid
+            bridge.twilio_telephony = telephony
             bridge.webhook_base_url = base_url
             bridge.prospect_name = prospect_name or ""  # Used in agent whisper
-            active_calls[call_id]["twilio_client"] = sw_client
-            active_calls[call_id]["telephony"] = sw
+            if transfer_client:
+                active_calls[call_id]["twilio_client"] = transfer_client
+            active_calls[call_id]["telephony"] = telephony
+            active_calls[call_id]["provider"] = provider_name
 
             active_calls[call_id]["call_sid"] = call_sid
             active_calls[call_id]["is_real_person"] = is_real_person
