@@ -2834,7 +2834,7 @@ class CallBridge:
                 try:
                     async for chunk in self.orchestrator.fallback_llm.generate_stream(
                         messages=compressed_messages,
-                        system_prompt=self.agent_config.system_prompt,
+                        system_prompt=effective_system_prompt,
                         temperature=self.agent_config.temperature,
                         max_tokens=self.agent_config.max_tokens,
                     ):
@@ -2878,19 +2878,20 @@ class CallBridge:
             )
             retry_text = ""
             try:
-                async for chunk in active_llm.generate_stream(
-                    messages=compressed_messages,
-                    system_prompt=rephrase_prompt,
-                    temperature=min(self.agent_config.temperature + 0.2, 1.0),
-                    max_tokens=self.agent_config.max_tokens,
-                ):
-                    text = chunk.get("text", "")
-                    if text:
-                        retry_text += text
-                    if chunk.get("is_complete"):
-                        break
-            except Exception:
-                pass  # Keep original if retry fails
+                async with asyncio.timeout(4.0):  # 4s max for rephrase retry
+                    async for chunk in active_llm.generate_stream(
+                        messages=compressed_messages,
+                        system_prompt=rephrase_prompt,
+                        temperature=min(self.agent_config.temperature + 0.2, 1.0),
+                        max_tokens=self.agent_config.max_tokens,
+                    ):
+                        text = chunk.get("text", "")
+                        if text:
+                            retry_text += text
+                        if chunk.get("is_complete"):
+                            break
+            except (asyncio.TimeoutError, Exception):
+                pass  # Keep original if retry fails or times out
             if retry_text.strip():
                 retry_text = self._enforce_brevity(retry_text.strip())
                 # Only use retry if it's actually different
