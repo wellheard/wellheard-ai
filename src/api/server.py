@@ -755,10 +755,28 @@ def create_app() -> FastAPI:
         from_number = form_data.get("From", "")
         to_number = form_data.get("To", "")
         if from_number and to_number and from_number == to_number:
+            # Self-call: route to test prospect AI (dynamic scenarios)
+            call_sid = form_data.get("CallSid", f"prospect-{uuid.uuid4().hex[:8]}")
+            prospect_call_id = f"prospect-{call_sid[:12]}"
+            import os
+            base_url = settings.base_url
+            if not base_url:
+                fly_app = os.environ.get("FLY_APP_NAME")
+                if fly_app:
+                    base_url = f"https://{fly_app}.fly.dev"
+                else:
+                    base_url = f"http://{settings.host}:{settings.port}"
+            ws_url = base_url.replace("https://", "wss://").replace("http://", "ws://")
+            stream_url = f"{ws_url}/v1/test-media-stream/prospect/{prospect_call_id}"
+            twiml = (
+                '<?xml version="1.0" encoding="UTF-8"?>'
+                f'<Response><Connect><Stream url="{stream_url}"/></Connect></Response>'
+            )
             logger.info("inbound_self_call_detected",
                 from_=from_number, to=to_number,
-                msg="Returning test prospect TwiML")
-            return await test_answer_twiml()
+                prospect_call_id=prospect_call_id,
+                msg="Routing to test prospect AI")
+            return Response(content=twiml, media_type="application/xml")
 
         call_id = str(uuid.uuid4())
         inbound_call_sid = form_data.get("CallSid", "")
@@ -2294,7 +2312,6 @@ def create_app() -> FastAPI:
         The prospect responds based on its randomly-selected scenario.
         """
         from ..test_actors import select_scenario, TestProspectBridge, scenario_summary
-        from ..providers.twilio_telephony import TwilioTelephony
 
         await websocket.accept()
         logger.info("test_prospect_media_stream_connected", call_id=call_id)
@@ -2329,10 +2346,12 @@ def create_app() -> FastAPI:
         try:
             await bridge.connect_providers()
 
-            twilio_telephony = TwilioTelephony(
-                account_sid=settings.twilio_account_sid,
-                auth_token=settings.twilio_auth_token,
-                phone_number=settings.twilio_phone_number,
+            # Use SignalWire telephony for media stream handling (wire-compatible with Twilio)
+            test_telephony = SignalWireTelephony(
+                project_id=settings.signalwire_project_id,
+                api_token=settings.signalwire_api_token,
+                space_name=settings.signalwire_space_name,
+                phone_number=settings.signalwire_phone_number,
             )
 
             # The on_audio callback feeds PCM to the bridge's input queue
@@ -2342,8 +2361,8 @@ def create_app() -> FastAPI:
             # Start the prospect's continuous conversation loop in background
             conv_task = asyncio.create_task(bridge.run_conversation_loop())
 
-            # Run the Twilio media stream handler (blocks until disconnect)
-            await twilio_telephony.handle_media_stream(
+            # Run the media stream handler (blocks until disconnect)
+            await test_telephony.handle_media_stream(
                 websocket=websocket,
                 call_id=call_id,
                 on_audio=on_audio,
