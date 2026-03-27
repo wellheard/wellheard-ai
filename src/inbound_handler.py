@@ -28,7 +28,7 @@ VOICE_ID = "734b0cda-9091-4144-9d4d-f33ffc2cc025"  # Vicky (cloned)
 VOICE_NAME = "Vicky"
 MODEL = "sonic-3"
 SPEED = 0.95  # Slightly slower than 1.0 = calmer, more authoritative, trustworthy
-EMOTION = ["positivity:medium", "curiosity:low"]  # Warm authority — calm confidence with gentle warmth
+EMOTION = "confident"  # Warm authority — calm confidence (Cartesia Sonic-3 literal emotion)
 LANGUAGE = "en"
 TEMPERATURE = 0.7
 MAX_TOKENS = 60  # Allow slightly longer responses for explaining the offer properly

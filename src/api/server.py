@@ -1029,6 +1029,16 @@ def create_app() -> FastAPI:
                     phone_number=settings.twilio_phone_number,
                 )
 
+            # Determine base URL for webhooks (transfer callbacks, etc.)
+            base_url = settings.base_url
+            if not base_url:
+                import os as _os
+                fly_app = _os.environ.get("FLY_APP_NAME")
+                if fly_app:
+                    base_url = f"https://{fly_app}.fly.dev"
+                else:
+                    base_url = f"http://{settings.host}:{settings.port}"
+
             if bridge:
                 # Wire telephony for clear messages on barge-in (duck-typed)
                 bridge.twilio_telephony = telephony
