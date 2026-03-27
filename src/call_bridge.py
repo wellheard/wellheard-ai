@@ -28,6 +28,7 @@ from .silence_manager import SilenceManager, SilenceConfig, BACKCHANNELS, HOLD_P
 from .conversation_recovery import ConversationRecovery, RecoveryConfig, CallState
 from .response_cache import SemanticResponseCache
 from .sentiment_analyzer import SentimentAnalyzer
+from .fast_call_filter import VM_PATTERNS_FAST, VM_PATTERNS_MEDIUM, VM_PATTERNS_CARRIER
 
 logger = structlog.get_logger()
 
@@ -2123,6 +2124,45 @@ class CallBridge:
                 # becoming two separate turns instead of one).
                 if speech_final and accumulated_transcript.strip():
                     self._phase3_first_speech = True
+
+                    # ── Voicemail transcript detection (first 2 turns only) ──
+                    # If the first thing we hear matches voicemail patterns,
+                    # hang up immediately instead of trying to converse.
+                    if turn_number == 0:
+                        vm_text = accumulated_transcript.strip()
+                        is_vm = False
+                        for pat in VM_PATTERNS_FAST + VM_PATTERNS_CARRIER:
+                            if pat.search(vm_text):
+                                is_vm = True
+                                break
+                        if not is_vm:
+                            # Check medium patterns + carrier keywords
+                            vm_lower = vm_text.lower()
+                            carrier_keywords = [
+                                "mailbox", "has not been set up",
+                                "is not available", "not in service",
+                                "disconnected", "no longer in service",
+                                "not a working number", "been changed",
+                                "cannot be completed as dialed",
+                                "the number you have dialed",
+                            ]
+                            for kw in carrier_keywords:
+                                if kw in vm_lower:
+                                    is_vm = True
+                                    break
+                        if not is_vm:
+                            for pat in VM_PATTERNS_MEDIUM:
+                                if pat.search(vm_text):
+                                    is_vm = True
+                                    break
+                        if is_vm:
+                            logger.info("voicemail_transcript_detected_hangup",
+                                call_id=self.call_id,
+                                transcript=vm_text[:120])
+                            self._active = False
+                            await self._hangup_twilio()
+                            return
+
                     # Notify backchannel manager that prospect finished speaking
                     self._backchannel_manager.on_prospect_speech_ended()
 
