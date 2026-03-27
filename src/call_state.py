@@ -184,8 +184,25 @@ class CallStateTracker:
         if self.current_step == ScriptStep.BANK_ACCOUNT:
             self.step_status[ScriptStep.BANK_ACCOUNT] = StepStatus.IN_PROGRESS
 
+            # ── Detect "you already asked that" complaints ──
+            # If the prospect says we already asked, advance immediately to avoid looping
+            already_asked_markers = [
+                "already asked", "you just asked", "asked me that",
+                "you already", "said that already", "told you",
+                "already told", "just said", "already answered",
+                "you asked that", "asked that before", "same question",
+            ]
+            if any(marker in user_lower for marker in already_asked_markers):
+                # They're frustrated — assume bank account is confirmed and move on
+                if self.has_bank_account is None:
+                    self.has_bank_account = True
+                    self.bank_account_type = "assumed_yes"
+                self.advance_step()
+                logger.info("bank_account_auto_advanced_already_asked",
+                    call_id=self.call_id, user_text=user_text[:80])
+
             # Did we get bank account info?
-            if "checking" in user_lower and "savings" in user_lower:
+            elif "checking" in user_lower and "savings" in user_lower:
                 self.has_bank_account = True
                 self.bank_account_type = "both"
                 self.advance_step()
@@ -202,18 +219,21 @@ class CallStateTracker:
                 self.has_bank_account = False
                 self.bank_account_type = "neither"
                 self.advance_step()
-            # If user says yes/yeah to the bank question
-            elif any(w in user_lower for w in ["yes", "yeah", "yep", "i do"]):
-                # Only if the assistant asked about bank in a recent context
-                if any(w in asst_lower for w in ["checking", "savings", "bank"]):
-                    self.has_bank_account = True
-                    self.bank_account_type = "yes"
-                    self.advance_step()
+            # If user says yes/yeah to the bank question — we're on BANK_ACCOUNT step,
+            # so any affirmative response IS about the bank account. No need to check
+            # assistant's words (the assistant may already be talking about transfer).
+            elif any(w in user_lower for w in ["yes", "yeah", "yep", "i do", "sure",
+                                                "of course", "both", "uh huh", "mm hmm",
+                                                "yup", "right"]):
+                self.has_bank_account = True
+                self.bank_account_type = "yes"
+                self.advance_step()
 
             # If assistant is talking about transfer/agent but bank account wasn't asked,
             # do NOT auto-advance. The LLM must ask about bank account first.
             # Only advance if bank account info was actually obtained.
-            if any(w in asst_lower for w in ["licensed agent", "transfer", "connecting you",
+            if self.current_step == ScriptStep.BANK_ACCOUNT and \
+               any(w in asst_lower for w in ["licensed agent", "transfer", "connecting you",
                                               "agent standing by"]):
                 if self.has_bank_account is not None:
                     # Bank account was answered — safe to advance

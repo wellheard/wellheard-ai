@@ -1163,13 +1163,15 @@ def create_app() -> FastAPI:
         orchestrator = None
 
         # Audio conversion state (persistent across frames for clean audio)
+        ratecv_state_up = None    # For 8k→16k upsampling — MUST persist to avoid frame-boundary clicks
         ratecv_state_down = None  # For 16k→8k downsampling
         lpf_hist = [0, 0]  # Low-pass filter history
 
         def mulaw_8k_to_pcm_16k(mulaw_data: bytes) -> bytes:
             """Convert incoming mulaw 8kHz to PCM 16kHz for AI pipeline."""
+            nonlocal ratecv_state_up
             pcm_8k = audioop.ulaw2lin(mulaw_data, 2)
-            pcm_16k, _ = audioop.ratecv(pcm_8k, 2, 1, 8000, 16000, None)
+            pcm_16k, ratecv_state_up = audioop.ratecv(pcm_8k, 2, 1, 8000, 16000, ratecv_state_up)
             return pcm_16k
 
         def pcm_16k_to_mulaw_8k(pcm_data: bytes) -> bytes:

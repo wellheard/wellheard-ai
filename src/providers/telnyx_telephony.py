@@ -39,7 +39,8 @@ class TelnyxTelephony:
         self.sip_password = sip_password
         self._active_streams = {}  # call_id -> stream info
         self._websockets = {}  # call_id -> websocket (for sending clear messages)
-        self._ratecv_state = None  # Persistent state for audioop.ratecv (prevents clicks)
+        self._ratecv_state = None  # Persistent state for audioop.ratecv output (prevents clicks)
+        self._ratecv_state_up = None  # Persistent state for input upsampling (8k→16k)
         self._lpf_hist = [0, 0]  # Low-pass filter history
 
     async def send_clear(self, call_id: str) -> bool:
@@ -328,17 +329,18 @@ class TelnyxTelephony:
         except Exception as e:
             logger.error("send_audio_error", error=str(e))
 
-    @staticmethod
-    def mulaw_8k_to_pcm_16k(mulaw_data: bytes) -> bytes:
-        """Convert mulaw 8kHz (Telnyx) to PCM 16-bit 16kHz (pipeline)."""
+    def mulaw_8k_to_pcm_16k(self, mulaw_data: bytes) -> bytes:
+        """Convert mulaw 8kHz (Telnyx) to PCM 16-bit 16kHz (pipeline).
+        Maintains ratecv state across frames to prevent clicks at frame boundaries."""
         pcm_8k = audioop.ulaw2lin(mulaw_data, 2)
-        pcm_16k, _ = audioop.ratecv(pcm_8k, 2, 1, 8000, 16000, None)
+        pcm_16k, self._ratecv_state_up = audioop.ratecv(pcm_8k, 2, 1, 8000, 16000, self._ratecv_state_up)
         return pcm_16k
 
     def reset_audio_state(self):
         """Reset ratecv state — call after barge-in or audio clear to avoid
         stale state causing artifacts at the start of new audio."""
         self._ratecv_state = None
+        self._ratecv_state_up = None
         self._lpf_hist = [0, 0]  # Reset low-pass filter state too
 
     def pcm_16k_to_mulaw_8k(self, pcm_data: bytes) -> bytes:

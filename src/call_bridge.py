@@ -353,6 +353,7 @@ class CallBridge:
         # Transfer manager (initialized lazily)
         self._transfer_manager = None
         self._transfer_initiated = False
+        self._transfer_failed = False  # Set to True after all transfer retries exhausted — prevents re-triggering
 
         # Input: Twilio audio → orchestrator
         self._input_queue: asyncio.Queue[Optional[bytes]] = asyncio.Queue(maxsize=200)
@@ -590,7 +591,9 @@ class CallBridge:
     # After the prospect confirms interest, we ALWAYS ask about bank account.
     # Pre-synthesize this during dial to eliminate latency on turn 2.
     TURN2_BANK_ACCOUNT_TEXT = (
-        "Got it. Quick thing — do you have a checking or savings account?"
+        "Perfect, that's great to hear. One quick thing — "
+        "do you happen to have a checking or savings account? "
+        "That usually helps get you the best rate."
     )
 
     async def pre_synthesize_turn2_cache(self):
@@ -2631,10 +2634,18 @@ class CallBridge:
                 "Do NOT mention transfer or Sarah yet. End with the bank account question.]"
             )
         elif step == ScriptStep.TRANSFER:
-            effective_system_prompt += (
-                "\n[SYSTEM: You are on Step 3 (Transfer). Interest confirmed, bank account confirmed. "
-                "Now connect them to Sarah. Use the transfer trigger phrase.]"
-            )
+            if self._transfer_failed:
+                effective_system_prompt += (
+                    "\n[SYSTEM: You are on Step 3 (Transfer). TRANSFER HAS ALREADY FAILED. "
+                    "The agent is unavailable. Do NOT attempt another transfer. Do NOT mention "
+                    "transfer, connecting, or Sarah again. Instead: offer a callback within 15 minutes, "
+                    "or gracefully wrap up the call. Keep it brief and warm.]"
+                )
+            else:
+                effective_system_prompt += (
+                    "\n[SYSTEM: You are on Step 3 (Transfer). Interest confirmed, bank account confirmed. "
+                    "Now connect them to Sarah. Use the transfer trigger phrase.]"
+                )
 
         # Also add anti-repetition context (just last response — lean)
         anti_repeat = self._make_anti_repeat_instruction()
@@ -2807,6 +2818,16 @@ class CallBridge:
             semantic_cache_key, semantic_cache_audio, semantic_similarity = (
                 self._semantic_cache.find_best_match(response_text)
             )
+            # Guard: Don't serve bank account cache entries when we're past that step.
+            # This prevents the semantic cache from re-asking the bank question on later turns.
+            if semantic_cache_key and semantic_cache_key.startswith("qualify_account"):
+                current_step = self._call_state.current_step
+                if current_step in (ScriptStep.TRANSFER, ScriptStep.COMPLETED):
+                    logger.info("semantic_cache_blocked_past_step",
+                        call_id=self.call_id, key=semantic_cache_key,
+                        step=current_step.value)
+                    semantic_cache_audio = None
+                    semantic_cache_key = None
             if semantic_cache_audio:
                 logger.info("semantic_cache_hit",
                     call_id=self.call_id, turn=turn_number,
@@ -3190,7 +3211,7 @@ class CallBridge:
             machine_detection=transfer_cfg_raw.get("machine_detection", True),
             whisper_enabled=transfer_cfg_raw.get("whisper_enabled", True),
             callback_enabled=transfer_cfg_raw.get("callback_enabled", True),
-            caller_id="+13187222561",  # Our Twilio number
+            caller_id=transfer_cfg_raw.get("caller_id", "+19297090284"),  # SignalWire purchased number
         )
 
         self._transfer_manager = WarmTransferManager(
@@ -3304,8 +3325,10 @@ class CallBridge:
                 await self._synthesize_and_queue(fallback)
                 self.orchestrator._conversation_history.append(
                     {"role": "assistant", "content": fallback})
-                # Allow conversation to continue — prospect can respond
-                self._transfer_initiated = False
+                # Mark transfer as permanently failed — do NOT reset _transfer_initiated
+                # to prevent the LLM from triggering another transfer loop.
+                self._transfer_failed = True
+                self._silence_manager.resume()
                 return
 
             # ── Priority 3: Check max hold time ──
@@ -3316,8 +3339,9 @@ class CallBridge:
                 await self._synthesize_and_queue(fallback)
                 self.orchestrator._conversation_history.append(
                     {"role": "assistant", "content": fallback})
-                # Allow conversation to continue — prospect can respond
-                self._transfer_initiated = False
+                # Mark transfer as permanently failed — do NOT reset _transfer_initiated
+                self._transfer_failed = True
+                self._silence_manager.resume()
                 return
 
             # ── Play pre-synthesized hold audio at intervals ──

@@ -132,6 +132,7 @@ class SignalWireTelephony(TwilioTelephony):
         self._active_streams = {}
         self._websockets = {}
         self._ratecv_state = None
+        self._ratecv_state_up = None  # Persistent state for input upsampling (8k→16k)
         self._base_url = f"https://{space_name}.signalwire.com/2010-04-01/Accounts/{project_id}"
 
         # Set client to None — we use httpx for SignalWire REST calls
