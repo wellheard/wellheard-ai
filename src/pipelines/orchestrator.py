@@ -15,7 +15,7 @@ import time
 import uuid
 import structlog
 from dataclasses import dataclass, field
-from typing import AsyncIterator, Optional, Callable, Awaitable
+from typing import Any, AsyncIterator, Optional, Callable, Awaitable, Union
 
 from ..providers.base import STTProvider, LLMProvider, TTSProvider, CostEstimate
 from ..llm_router import LLMRouter
@@ -105,6 +105,8 @@ class AgentConfig:
     pitch_text: str = ""  # Pre-baked pitch (Phase 2) — synthesized during dial
     transfer_config: Optional[dict] = None  # Warm transfer configuration
     speed: float = 1.0  # TTS speed multiplier
+    emotion: Optional[Any] = None  # TTS emotion control (str or list[str])
+    volume: float = 1.0  # TTS volume multiplier
 
 
 class VoicePipelineOrchestrator:

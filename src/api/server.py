@@ -266,6 +266,8 @@ def create_app() -> FastAPI:
                 transfer_config=preset.get("transfer_config"),
                 tools=request.agent.tools,
                 speed=preset.get("speed", 1.0),
+                emotion=preset.get("emotion"),
+                volume=preset.get("volume", 1.0),
             )
             logger.info("agent_preset_loaded",
                 call_id=call_id,
@@ -835,6 +837,9 @@ def create_app() -> FastAPI:
                 temperature=INBOUND_CONFIG.get("temperature", 0.7),
                 max_tokens=INBOUND_CONFIG.get("max_tokens", 40),
                 transfer_config=INBOUND_CONFIG.get("transfer_config"),
+                speed=INBOUND_CONFIG.get("speed", 1.0),
+                emotion=INBOUND_CONFIG.get("emotion"),
+                volume=INBOUND_CONFIG.get("volume", 1.0),
             )
             inbound_orchestrator = QualityPipeline.create()
             inbound_bridge = CallBridge(
@@ -1316,6 +1321,9 @@ def create_app() -> FastAPI:
                 temperature=config.get("temperature", 0.7),
                 max_tokens=config.get("max_tokens", 40),
                 transfer_config=config.get("transfer_config"),
+                speed=config.get("speed", 1.0),
+                emotion=config.get("emotion"),
+                volume=config.get("volume", 1.0),
             )
 
             # ── Merge field injection ──
@@ -1911,6 +1919,7 @@ def create_app() -> FastAPI:
         from ..inbound_handler import (
             OUTBOUND_PITCH_TEXT, OUTBOUND_SYSTEM_PROMPT,
             VOICE_ID, TEMPERATURE, MAX_TOKENS, TRANSFER_CONFIG,
+            SPEED, EMOTION, VOLUME,
         )
 
         agent_config = AgentConfig(
@@ -1922,6 +1931,9 @@ def create_app() -> FastAPI:
             temperature=TEMPERATURE,
             max_tokens=MAX_TOKENS,
             transfer_config=TRANSFER_CONFIG,
+            speed=SPEED,
+            emotion=EMOTION,
+            volume=VOLUME,
         )
 
         # Create pipeline — identical to normal outbound call
@@ -2357,6 +2369,7 @@ def create_app() -> FastAPI:
         from ..inbound_handler import (
             OUTBOUND_PITCH_TEXT, OUTBOUND_SYSTEM_PROMPT,
             VOICE_ID, TEMPERATURE, MAX_TOKENS, TRANSFER_CONFIG,
+            SPEED, EMOTION, VOLUME,
         )
 
         # Use real transfer number for real people, test agent for AI tests
@@ -2384,6 +2397,9 @@ def create_app() -> FastAPI:
             temperature=TEMPERATURE,
             max_tokens=MAX_TOKENS,
             transfer_config=transfer_cfg,
+            speed=SPEED,
+            emotion=EMOTION,
+            volume=VOLUME,
         )
 
         # Create pipeline

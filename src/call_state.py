@@ -31,10 +31,11 @@ except ImportError:
 
 
 class ScriptStep(str, Enum):
-    """The 3-step qualification script."""
+    """The 4-step qualification script (matches original Dasha/Brightcall flow)."""
     CONFIRM_INTEREST = "confirm_interest"   # Step 1: Does that ring a bell? → interest
-    BANK_ACCOUNT = "bank_account"           # Step 2: Checking or savings?
-    TRANSFER = "transfer"                   # Step 3: Connect to licensed agent
+    URGENCY_PITCH = "urgency_pitch"         # Step 2: Preferred offer, $9K funeral costs, expires tomorrow
+    BANK_ACCOUNT = "bank_account"           # Step 3: Checking or savings for best discount?
+    TRANSFER = "transfer"                   # Step 4: Connect to licensed agent Sarah
     COMPLETED = "completed"                 # Call qualified and transferred
 
 
@@ -63,6 +64,7 @@ class CallStateTracker:
     current_step: ScriptStep = ScriptStep.CONFIRM_INTEREST
     step_status: dict = field(default_factory=lambda: {
         ScriptStep.CONFIRM_INTEREST: StepStatus.NOT_STARTED,
+        ScriptStep.URGENCY_PITCH: StepStatus.NOT_STARTED,
         ScriptStep.BANK_ACCOUNT: StepStatus.NOT_STARTED,
         ScriptStep.TRANSFER: StepStatus.NOT_STARTED,
     })
@@ -71,6 +73,8 @@ class CallStateTracker:
     # Once collected, NEVER ask again.
     prospect_remembers_request: Optional[bool] = None   # "Does that ring a bell?"
     prospect_interested: Optional[bool] = None          # Interested in quote?
+    urgency_pitch_delivered: Optional[bool] = None      # Explained the preferred offer?
+    urgency_accepted: Optional[bool] = None             # Want to see the quote?
     has_bank_account: Optional[bool] = None             # Checking or savings?
     bank_account_type: Optional[str] = None             # "checking", "savings", "both", "neither"
     transfer_accepted: Optional[bool] = None            # Agreed to connect with agent?
@@ -96,7 +100,7 @@ class CallStateTracker:
 
     def advance_step(self):
         """Move to the next script step."""
-        order = [ScriptStep.CONFIRM_INTEREST, ScriptStep.BANK_ACCOUNT, ScriptStep.TRANSFER]
+        order = [ScriptStep.CONFIRM_INTEREST, ScriptStep.URGENCY_PITCH, ScriptStep.BANK_ACCOUNT, ScriptStep.TRANSFER]
         try:
             idx = order.index(self.current_step)
             self.step_status[self.current_step] = StepStatus.COMPLETED
@@ -143,17 +147,16 @@ class CallStateTracker:
 
         # ── Detect what step we're on based on assistant response content ──
 
+        affirmatives = {"yes", "yeah", "yep", "sure", "okay", "ok", "sounds good",
+                       "go ahead", "alright", "absolutely", "definitely", "of course",
+                       "i'd like that", "tell me more", "i'm interested", "why not",
+                       "let's do it", "sure thing", "uh huh", "mm hmm", "yup", "right"}
+        negatives = {"no", "not interested", "no thanks", "don't want", "stop calling",
+                    "remove me", "take me off", "do not call", "not right now"}
+
         # Step 1 detection: confirm interest
         if self.current_step == ScriptStep.CONFIRM_INTEREST:
             self.step_status[ScriptStep.CONFIRM_INTEREST] = StepStatus.IN_PROGRESS
-
-            # Did we get an answer about interest?
-            affirmatives = {"yes", "yeah", "yep", "sure", "okay", "ok", "sounds good",
-                           "go ahead", "alright", "absolutely", "definitely", "of course",
-                           "i'd like that", "tell me more", "i'm interested", "why not",
-                           "let's do it", "sure thing"}
-            negatives = {"no", "not interested", "no thanks", "don't want", "stop calling",
-                        "remove me", "take me off", "do not call", "not right now"}
 
             # Check if user expressed interest or rejection
             for phrase in affirmatives:
@@ -173,19 +176,41 @@ class CallStateTracker:
                                                 "i never", "not sure"]):
                 self.prospect_remembers_request = False
 
-            # Advance to Step 2 when prospect confirms interest OR assistant moves to bank
+            # Advance to Step 2 (Urgency Pitch) when prospect confirms interest
             if self.prospect_interested:
                 self.advance_step()
-            elif any(w in asst_lower for w in ["checking", "savings", "bank account"]):
-                self.prospect_interested = True
-                self.advance_step()
 
-        # Step 2 detection: bank account
+        # Step 2 detection: urgency pitch
+        # The assistant delivers the urgency pitch (preferred offer, $9K, expires tomorrow)
+        # and asks if the prospect wants to see the quote. Any affirmative → Step 3.
+        if self.current_step == ScriptStep.URGENCY_PITCH:
+            self.step_status[ScriptStep.URGENCY_PITCH] = StepStatus.IN_PROGRESS
+
+            # Track that assistant delivered the urgency pitch
+            urgency_keywords = ["expires", "funeral", "nine thousand", "9000", "9,000",
+                               "preferred offer", "set aside", "burial", "cremation",
+                               "worth a look", "coverage"]
+            if any(w in asst_lower for w in urgency_keywords):
+                self.urgency_pitch_delivered = True
+
+            # Check if prospect accepted the urgency pitch
+            for phrase in affirmatives:
+                if phrase in user_lower:
+                    self.urgency_accepted = True
+                    self.advance_step()
+                    break
+
+            # If assistant is already asking about bank account, auto-advance
+            if self.current_step == ScriptStep.URGENCY_PITCH:
+                if any(w in asst_lower for w in ["checking", "savings", "bank account"]):
+                    self.urgency_accepted = True
+                    self.advance_step()
+
+        # Step 3 detection: bank account
         if self.current_step == ScriptStep.BANK_ACCOUNT:
             self.step_status[ScriptStep.BANK_ACCOUNT] = StepStatus.IN_PROGRESS
 
             # ── Detect "you already asked that" complaints ──
-            # If the prospect says we already asked, advance immediately to avoid looping
             already_asked_markers = [
                 "already asked", "you just asked", "asked me that",
                 "you already", "said that already", "told you",
@@ -193,7 +218,6 @@ class CallStateTracker:
                 "you asked that", "asked that before", "same question",
             ]
             if any(marker in user_lower for marker in already_asked_markers):
-                # They're frustrated — assume bank account is confirmed and move on
                 if self.has_bank_account is None:
                     self.has_bank_account = True
                     self.bank_account_type = "assumed_yes"
@@ -219,27 +243,21 @@ class CallStateTracker:
                 self.has_bank_account = False
                 self.bank_account_type = "neither"
                 self.advance_step()
-            # If user says yes/yeah to the bank question — we're on BANK_ACCOUNT step,
-            # so any affirmative response IS about the bank account. No need to check
-            # assistant's words (the assistant may already be talking about transfer).
+            # Any affirmative at BANK_ACCOUNT step IS about the bank account
             elif any(w in user_lower for w in ["yes", "yeah", "yep", "i do", "sure",
                                                 "of course", "both", "uh huh", "mm hmm",
-                                                "yup", "right"]):
+                                                "yup"]):
                 self.has_bank_account = True
                 self.bank_account_type = "yes"
                 self.advance_step()
 
-            # If assistant is talking about transfer/agent and we still haven't advanced,
-            # check if bank account was already collected in a prior turn.
-            # Use elif to prevent double-advancing within the same update_from_exchange call.
+            # If assistant is talking about transfer and bank was already answered
             elif any(w in asst_lower for w in ["licensed agent", "transfer", "connecting you",
                                                 "agent standing by"]):
                 if self.has_bank_account is not None:
-                    # Bank account was answered in a prior turn — safe to advance
                     self.advance_step()
-                # else: bank account not yet answered — stay on step 2
 
-        # Step 3 detection: transfer
+        # Step 4 detection: transfer
         if self.current_step == ScriptStep.TRANSFER:
             self.step_status[ScriptStep.TRANSFER] = StepStatus.IN_PROGRESS
             if any(w in user_lower for w in ["yes", "yeah", "okay", "sure", "sounds good"]):
@@ -351,8 +369,9 @@ class CallStateTracker:
         # Step progress
         step_display = {
             ScriptStep.CONFIRM_INTEREST: "Step 1 (Confirm Interest)",
-            ScriptStep.BANK_ACCOUNT: "Step 2 (Bank Account)",
-            ScriptStep.TRANSFER: "Step 3 (Transfer)",
+            ScriptStep.URGENCY_PITCH: "Step 2 (Urgency Pitch)",
+            ScriptStep.BANK_ACCOUNT: "Step 3 (Bank Account)",
+            ScriptStep.TRANSFER: "Step 4 (Transfer)",
         }
         for step, label in step_display.items():
             status = self.step_status.get(step, StepStatus.NOT_STARTED)
@@ -365,6 +384,10 @@ class CallStateTracker:
             lines.append(f"  - Remembers filling out request: {'YES' if self.prospect_remembers_request else 'NO'}")
         if self.prospect_interested is not None:
             lines.append(f"  - Interested in quote: {'YES' if self.prospect_interested else 'NO'}")
+        if self.urgency_pitch_delivered is not None:
+            lines.append(f"  - Urgency pitch delivered: {'YES' if self.urgency_pitch_delivered else 'NO'}")
+        if self.urgency_accepted is not None:
+            lines.append(f"  - Accepted urgency/wants quote: {'YES' if self.urgency_accepted else 'NO'}")
         if self.has_bank_account is not None:
             lines.append(f"  - Has bank account: {'YES' if self.has_bank_account else 'NO'} ({self.bank_account_type or 'unknown type'})")
         if self.transfer_accepted is not None:

@@ -471,22 +471,32 @@ class CallBridge:
         # precision (avoid false positives) with recall (catch paraphrases).
         self._semantic_cache = SemanticResponseCache(similarity_threshold=0.65)
         self._turn1_responses = {
-            # Pattern → response text — SHORT (under 25 words each)
+            # Pattern → response text — these ARE the urgency pitch (Step 2)
+            # Delivered immediately after interest confirmed, covering the full pitch:
+            # preferred offer + funeral costs + expires tomorrow
             "yes": (
-                "Oh nice! So there's a preferred offer set aside for you — "
-                "expires tomorrow though. Want me to pull it up?"
+                "Oh great! Yeah so here's the thing — a preferred offer for your "
+                "burial and cremation coverage was actually set aside for you, and "
+                "it was never claimed. With funeral costs running over nine thousand "
+                "these days, it's definitely worth a look. And this one actually "
+                "expires tomorrow. Want me to see what it looks like for you?"
             ),
             "confused": (
-                "No worries. A coverage offer came through with your name on it, "
-                "runs out tomorrow. Want me to take a look?"
+                "No worries, happens all the time. So basically a preferred offer "
+                "for burial and cremation coverage came through with your name on it. "
+                "With funeral costs over nine thousand dollars these days, it's worth "
+                "a look — and it expires tomorrow. Want me to pull it up?"
             ),
             "no_memory": (
-                "That's okay. I've got a burial coverage quote here for you — "
-                "want me to go over it real quick?"
+                "That's okay. So here's the thing — a preferred offer for your "
+                "burial or cremation coverage was set aside for you and never claimed. "
+                "Funeral costs are running over nine thousand these days. This offer "
+                "expires tomorrow though. Want me to go over it with you?"
             ),
             "not_interested": (
-                "I hear you. It's free, no strings. Just a quick peek before "
-                "it expires — worth a look?"
+                "I hear you. It's just a free quote, no obligation at all. "
+                "A preferred offer was set aside and it expires tomorrow — "
+                "worth at least a quick look, right?"
             ),
         }
         # Keywords that map to each pattern
@@ -587,27 +597,28 @@ class CallBridge:
                         return key
         return None
 
-    # ── Turn 2 Cache (Bank Account Question) ────────────────────────────
-    # After the prospect confirms interest, we ALWAYS ask about bank account.
-    # Pre-synthesize this during dial to eliminate latency on turn 2.
-    TURN2_BANK_ACCOUNT_TEXT = (
-        "Perfect, that's great to hear. One quick thing — "
-        "do you happen to have a checking or savings account? "
-        "That usually helps get you the best rate."
+    # ── Turn 3 Cache (Bank Account Question) ────────────────────────────
+    # After urgency pitch accepted (step 2 done), step 3 ALWAYS asks about bank account.
+    # Pre-synthesize this during dial to eliminate latency.
+    TURN3_BANK_ACCOUNT_TEXT = (
+        "Perfect. So one quick thing — "
+        "people who have a checking or savings account usually get the biggest discounts. "
+        "Do you have one or the other?"
     )
 
     async def pre_synthesize_turn2_cache(self):
-        """Pre-synthesize the bank account question audio during dial time."""
+        """Pre-synthesize the bank account question audio during dial time.
+        (Method name kept for backward compat — actually turn 3 in 4-step flow.)"""
         try:
             audio = await self.orchestrator.tts.synthesize_single(
-                text=self.TURN2_BANK_ACCOUNT_TEXT,
+                text=self.TURN3_BANK_ACCOUNT_TEXT,
                 voice_id=self.agent_config.voice_id)
             if audio:
                 self._turn2_bank_audio = audio
-                logger.info("turn2_cache_ready", call_id=self.call_id)
+                logger.info("turn3_bank_cache_ready", call_id=self.call_id)
         except Exception as e:
             self._turn2_bank_audio = None
-            logger.debug("turn2_cache_failed", error=str(e))
+            logger.debug("turn3_bank_cache_failed", error=str(e))
 
     async def pre_synthesize_semantic_cache(self):
         """Pre-synthesize common response patterns during dial time for turns 3+.
@@ -930,6 +941,8 @@ class CallBridge:
         Strips verbose instructions for COMPLETED steps to reduce token count.
         This is the single biggest lever for reducing LLM TTFT — cutting 30-40%
         of input tokens on later turns.
+
+        4-step flow: Confirm Interest → Urgency Pitch → Bank Account → Transfer
         """
         import re
         step = self._call_state.current_step
@@ -937,26 +950,29 @@ class CallBridge:
         if step == ScriptStep.CONFIRM_INTEREST:
             return system_prompt  # Need full prompt on Step 1
 
-        # On Step 2+: replace goal 1 with "DONE", strip Step 1 examples
-        if step in (ScriptStep.BANK_ACCOUNT, ScriptStep.TRANSFER, ScriptStep.COMPLETED):
+        # On Step 2+: replace Step 1 with "DONE"
+        if step in (ScriptStep.URGENCY_PITCH, ScriptStep.BANK_ACCOUNT,
+                    ScriptStep.TRANSFER, ScriptStep.COMPLETED):
             system_prompt = re.sub(
                 r'1\. CONFIRM INTEREST[^\n]*',
                 '1. CONFIRM INTEREST — DONE (prospect is interested).',
                 system_prompt)
-            # Strip Step 1 examples (saves ~50 tokens)
-            system_prompt = re.sub(
-                r'- Step 1 —[^\n]*\n', '', system_prompt)
 
-        # On Step 3+: also replace goal 2 with "DONE", strip Step 2 examples
+        # On Step 3+: also replace Step 2 with "DONE"
+        if step in (ScriptStep.BANK_ACCOUNT, ScriptStep.TRANSFER, ScriptStep.COMPLETED):
+            system_prompt = re.sub(
+                r'2\. URGENCY (?:PITCH|DETAILS)[^\n]*',
+                '2. URGENCY PITCH — DONE (offer explained, prospect wants quote).',
+                system_prompt)
+
+        # On Step 4+: also replace Step 3 with "DONE", strip objection handling
         if step in (ScriptStep.TRANSFER, ScriptStep.COMPLETED):
             bank_info = self._call_state.bank_account_type or "confirmed"
             system_prompt = re.sub(
-                r'2\. BANK ACCOUNT[^\n]*',
-                f'2. BANK ACCOUNT — DONE (account: {bank_info}).',
+                r'3\. BANK ACCOUNT[^\n]*',
+                f'3. BANK ACCOUNT — DONE (account: {bank_info}).',
                 system_prompt)
-            # Strip Step 2 examples and objection handling (saves ~150 tokens)
-            system_prompt = re.sub(
-                r'- Step 2 —[^\n]*\n', '', system_prompt)
+            # Strip objection handling (saves ~150 tokens)
             system_prompt = re.sub(
                 r'OBJECTION HANDLING —[^\n]*\n(?:- [^\n]*\n)*', '', system_prompt)
 
@@ -1331,6 +1347,21 @@ class CallBridge:
         greeting_text = self.agent_config.greeting or self.DEFAULT_GREETING
         logger.info("greeting_pre_synthesis_starting",
             call_id=self.call_id, greeting=greeting_text[:80])
+
+        # ── VOICE CONSISTENCY FIX ──────────────────────────────────────
+        # Apply agent config speed/emotion to TTS BEFORE synthesis.
+        # Without this, TTS uses defaults (speed=1.05, emotion="confident")
+        # instead of agent's tuned params (speed=0.95, emotion per config).
+        active_tts = self.orchestrator.tts
+        if hasattr(active_tts, 'update_voice_params'):
+            agent_speed = getattr(self.agent_config, 'speed', None)
+            agent_emotion = getattr(self.agent_config, 'emotion', None)
+            agent_volume = getattr(self.agent_config, 'volume', None)
+            active_tts.update_voice_params(
+                speed=agent_speed, emotion=agent_emotion, volume=agent_volume)
+            logger.info("voice_params_applied_pre_synthesis",
+                call_id=self.call_id, speed=agent_speed,
+                emotion=agent_emotion, volume=agent_volume)
 
         t0 = time.time()
         try:
@@ -2037,6 +2068,18 @@ class CallBridge:
                                     accumulated_transcript = ""
                                 turn_number += 1
                                 if turn_number > MAX_PHASE3_TURNS:
+                                    # Graceful exit with goodbye instead of abrupt hangup
+                                    logger.info("max_turns_reached",
+                                        call_id=self.call_id, turns=turn_number)
+                                    try:
+                                        goodbye = "I appreciate your time! I'll have someone follow up with you. Have a wonderful day!"
+                                        audio = await self.orchestrator.tts.synthesize_single(
+                                            text=goodbye, voice_id=self.agent_config.voice_id)
+                                        if audio:
+                                            self._queue_audio(audio)
+                                            await asyncio.sleep(3.0)
+                                    except Exception:
+                                        pass
                                     self._active = False
                                     await self._hangup_twilio()
                                     return
@@ -2570,15 +2613,16 @@ class CallBridge:
                     self._schedule_silence_clock(playback_s)
                     return
 
-        # ── TURN 2 CACHE: Serve bank account question instantly ─────────
-        # After Turn 1 (interest confirmed), Turn 2 ALWAYS asks about bank account.
+        # ── TURN 3 CACHE: Serve bank account question instantly ─────────
+        # After urgency pitch accepted (step 2 done), step 3 ALWAYS asks about bank account.
         # Use pre-synthesized audio to eliminate LLM + TTS latency entirely.
-        if (turn_number == 2
-            and self._turn2_bank_audio
-            and self._call_state.current_step == ScriptStep.BANK_ACCOUNT):
-            cached_text = self.TURN2_BANK_ACCOUNT_TEXT
+        # Trigger on step transition, not turn number (could be turn 2 or 3 depending on flow).
+        if (self._turn2_bank_audio
+            and self._call_state.current_step == ScriptStep.BANK_ACCOUNT
+            and self._call_state.has_bank_account is None):
+            cached_text = self.TURN3_BANK_ACCOUNT_TEXT
             cached_audio = self._turn2_bank_audio
-            logger.info("turn2_cache_hit",
+            logger.info("turn3_bank_cache_hit",
                 call_id=self.call_id, transcript=transcript[:80])
             queued = self._queue_audio(cached_audio)
             self._ai_speaking = True
@@ -2602,7 +2646,7 @@ class CallBridge:
                 perceived_latency_ms=round(elapsed, 1),
                 total_ms=round(elapsed, 0),
                 frames_queued=queued,
-                turn2_cache_hit=True)
+                bank_cache_hit=True)
             playback_s = queued * 0.02
             self._schedule_silence_clock(playback_s)
             return
@@ -2633,27 +2677,37 @@ class CallBridge:
         if step == ScriptStep.CONFIRM_INTEREST:
             effective_system_prompt += (
                 "\n[SYSTEM: You are on Step 1 (Confirm Interest). "
-                "Your goal is to get them interested in the offer. "
-                "End with a question about whether they want to see the offer.]"
+                "Your goal is to confirm they remember/are open to hearing about the offer. "
+                "End with a question about whether they want to hear about it.]"
+            )
+        elif step == ScriptStep.URGENCY_PITCH:
+            effective_system_prompt += (
+                "\n[SYSTEM: You are on Step 2 (Urgency Pitch). The prospect is interested. "
+                "NOW deliver the urgency pitch: a preferred offer for burial/cremation coverage "
+                "was set aside for them and never claimed. Funeral costs run over nine thousand dollars. "
+                "The offer expires tomorrow. Make it real and concrete. "
+                "End with: do they want to see what it looks like for them? "
+                "Do NOT ask about bank account yet. Do NOT mention transfer or Sarah yet.]"
             )
         elif step == ScriptStep.BANK_ACCOUNT:
             effective_system_prompt += (
-                "\n[SYSTEM: You are on Step 2 (Bank Account). The prospect is interested. "
+                "\n[SYSTEM: You are on Step 3 (Bank Account). Prospect wants the quote. "
                 "You MUST ask about their bank account NOW. Ask: do they have a checking or savings account? "
+                "People with one usually get the biggest discounts. "
                 "Do NOT mention transfer or Sarah yet. End with the bank account question.]"
             )
         elif step == ScriptStep.TRANSFER:
             if self._transfer_failed:
                 effective_system_prompt += (
-                    "\n[SYSTEM: You are on Step 3 (Transfer). TRANSFER HAS ALREADY FAILED. "
+                    "\n[SYSTEM: You are on Step 4 (Transfer). TRANSFER HAS ALREADY FAILED. "
                     "The agent is unavailable. Do NOT attempt another transfer. Do NOT mention "
                     "transfer, connecting, or Sarah again. Instead: offer a callback within 15 minutes, "
                     "or gracefully wrap up the call. Keep it brief and warm.]"
                 )
             else:
                 effective_system_prompt += (
-                    "\n[SYSTEM: You are on Step 3 (Transfer). Interest confirmed, bank account confirmed. "
-                    "Now connect them to Sarah. Use the transfer trigger phrase.]"
+                    "\n[SYSTEM: You are on Step 4 (Transfer). Interest confirmed, urgency delivered, "
+                    "bank account confirmed. Now connect them to Sarah. Use the transfer trigger phrase.]"
                 )
 
         # Also add anti-repetition context (just last response — lean)
