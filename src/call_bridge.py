@@ -944,6 +944,9 @@ class CallBridge:
         of input tokens on later turns.
 
         4-step flow: Confirm Interest → Urgency Pitch → Bank Account → Transfer
+
+        Uses multiline regex to strip full step content blocks (not just headers),
+        replacing them with single-line "DONE" summaries.
         """
         import re
         step = self._call_state.current_step
@@ -951,31 +954,37 @@ class CallBridge:
         if step == ScriptStep.CONFIRM_INTEREST:
             return system_prompt  # Need full prompt on Step 1
 
-        # On Step 2+: replace Step 1 with "DONE"
+        # On Step 2+: replace Step 1 block with "DONE"
         if step in (ScriptStep.URGENCY_PITCH, ScriptStep.BANK_ACCOUNT,
                     ScriptStep.TRANSFER, ScriptStep.COMPLETED):
+            # Strip from "1. CONFIRM INTEREST" up to (but not including) "2."
             system_prompt = re.sub(
-                r'1\. CONFIRM INTEREST[^\n]*',
-                '1. CONFIRM INTEREST — DONE (prospect is interested).',
-                system_prompt)
+                r'1\. CONFIRM INTEREST.*?(?=\n\d\. |\nCRITICAL|\nEXAMPLES|\nOBJECTION|\nHARD)',
+                '1. CONFIRM INTEREST — DONE (prospect is interested).\n',
+                system_prompt, flags=re.DOTALL)
 
-        # On Step 3+: also replace Step 2 with "DONE"
+        # On Step 3+: also replace Step 2 block with "DONE"
         if step in (ScriptStep.BANK_ACCOUNT, ScriptStep.TRANSFER, ScriptStep.COMPLETED):
             system_prompt = re.sub(
-                r'2\. URGENCY (?:PITCH|DETAILS)[^\n]*',
-                '2. URGENCY PITCH — DONE (offer explained, prospect wants quote).',
-                system_prompt)
+                r'2\. URGENCY (?:PITCH|DETAILS).*?(?=\n\d\. |\nCRITICAL|\nEXAMPLES|\nOBJECTION|\nHARD)',
+                '2. URGENCY PITCH — DONE (offer explained, prospect wants quote).\n',
+                system_prompt, flags=re.DOTALL)
 
-        # On Step 4+: also replace Step 3 with "DONE", strip objection handling
+        # On Step 4+: also replace Step 3 block with "DONE", strip examples + objections
         if step in (ScriptStep.TRANSFER, ScriptStep.COMPLETED):
             bank_info = self._call_state.bank_account_type or "confirmed"
             system_prompt = re.sub(
-                r'3\. BANK ACCOUNT[^\n]*',
-                f'3. BANK ACCOUNT — DONE (account: {bank_info}).',
-                system_prompt)
-            # Strip objection handling (saves ~150 tokens)
+                r'3\. BANK ACCOUNT.*?(?=\n\d\. |\nCRITICAL|\nEXAMPLES|\nOBJECTION|\nHARD)',
+                f'3. BANK ACCOUNT — DONE (account: {bank_info}).\n',
+                system_prompt, flags=re.DOTALL)
+            # Strip objection handling block (saves ~150 tokens)
             system_prompt = re.sub(
-                r'OBJECTION HANDLING —[^\n]*\n(?:- [^\n]*\n)*', '', system_prompt)
+                r'OBJECTION HANDLING.*?(?=\nHARD CONSTRAINTS|\nABSOLUTE RULES|\Z)',
+                '', system_prompt, flags=re.DOTALL)
+            # Strip examples of natural flow (saves ~100 tokens)
+            system_prompt = re.sub(
+                r'EXAMPLES OF NATURAL FLOW.*?(?=\nOBJECTION|\nHARD|\nABSOLUTE|\Z)',
+                '', system_prompt, flags=re.DOTALL)
 
         return system_prompt
 
@@ -2528,6 +2537,31 @@ class CallBridge:
         if self._transfer_manager and self._transfer_manager.is_transferring:
             logger.info("text_turn_skipped_during_transfer",
                 call_id=self.call_id, turn=turn_number, transcript=transcript[:80])
+            return
+
+        # ── GOODBYE DETECTION: If prospect says goodbye, reciprocate and hang up ──
+        transcript_lower = transcript.strip().lower()
+        GOODBYE_PHRASES = [
+            "goodbye", "good bye", "bye bye", "bye now", "have a good day",
+            "have a good one", "take care", "talk to you later", "gotta go",
+            "i gotta go", "not interested goodbye", "no thanks bye",
+        ]
+        if any(g in transcript_lower for g in GOODBYE_PHRASES):
+            logger.info("prospect_goodbye_detected",
+                call_id=self.call_id, turn=turn_number, transcript=transcript[:80])
+            goodbye_text = "Have a wonderful day! Take care!"
+            await self._synthesize_and_queue(goodbye_text)
+            self.orchestrator._conversation_history.append(
+                {"role": "user", "content": transcript})
+            self.orchestrator._conversation_history.append(
+                {"role": "assistant", "content": goodbye_text})
+            self._call_state.update_from_exchange(transcript, goodbye_text)
+            # Schedule hangup after goodbye plays
+            async def _goodbye_hangup():
+                await asyncio.sleep(2.5)
+                self._active = False
+                await self._hangup_twilio()
+            asyncio.create_task(_goodbye_hangup())
             return
 
         # FREEZE silence clock — AI is generating a response.
