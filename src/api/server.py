@@ -1910,8 +1910,8 @@ def create_app() -> FastAPI:
         STT → LLM → TTS, and responds. Check logs or GET /v1/test-call/{call_id}
         for results.
         """
-        if not settings.twilio_account_sid:
-            raise HTTPException(status_code=400, detail="Twilio not configured")
+        if not settings.signalwire_project_id or not settings.signalwire_api_token:
+            raise HTTPException(status_code=400, detail="SignalWire not configured")
 
         call_id = f"test-{uuid.uuid4().hex[:8]}"
 
@@ -1999,35 +1999,31 @@ def create_app() -> FastAPI:
         )
 
         try:
-            from twilio.rest import Client as TwilioClient
-            twilio_client = TwilioClient(
-                settings.twilio_account_sid, settings.twilio_auth_token
+            # Use SignalWire for outbound call
+            sw = SignalWireTelephony(
+                project_id=settings.signalwire_project_id,
+                api_token=settings.signalwire_api_token,
+                space_name=settings.signalwire_space_name,
+                phone_number=settings.signalwire_phone_number,
+            )
+            call_sid = await sw.make_outbound_call(
+                to_number=settings.signalwire_phone_number,  # Call our own number (loopback)
+                call_id=call_id,
+                ws_url=ws_url,
             )
 
-            # Make the call:
-            # - Caller side (our AI): connects to our media stream WebSocket
-            # - Callee side (test bot): auto-answers with scripted speech via URL callback
-            call = twilio_client.calls.create(
-                to=settings.twilio_phone_number,  # Call our own number
-                from_=settings.twilio_phone_number,
-                twiml=our_twiml,
-                # When our number answers, Twilio fetches this URL for callee TwiML
-                # Note: This only works if the Twilio number's voice webhook is set
-                # to our /v1/calls/inbound endpoint. Alternatively, the inbound handler
-                # creates a second AI agent, and two AI agents talk to each other.
-            )
-
-            active_calls[call_id]["call_sid"] = call.sid
+            active_calls[call_id]["call_sid"] = call_sid
+            active_calls[call_id]["telephony"] = sw
 
             logger.info("test_call_initiated",
                 call_id=call_id,
-                call_sid=call.sid,
+                call_sid=call_sid,
                 ws_url=ws_url,
             )
 
             return {
                 "call_id": call_id,
-                "call_sid": call.sid,
+                "call_sid": call_sid,
                 "status": "initiated",
                 "message": (
                     "Loopback test call started. Our AI agent will talk to "
@@ -2358,10 +2354,10 @@ def create_app() -> FastAPI:
 
         Returns call_id, call_sid, scenario selected, and test metadata.
         """
-        if not settings.twilio_account_sid:
-            raise HTTPException(status_code=400, detail="Twilio not configured")
-        if not settings.twilio_phone_number:
-            raise HTTPException(status_code=400, detail="Twilio phone number not configured")
+        if not settings.signalwire_project_id or not settings.signalwire_api_token:
+            raise HTTPException(status_code=400, detail="SignalWire not configured")
+        if not settings.signalwire_phone_number:
+            raise HTTPException(status_code=400, detail="SignalWire phone number not configured")
 
         call_id = f"test-v2-{uuid.uuid4().hex[:8]}"
 
@@ -2466,11 +2462,6 @@ def create_app() -> FastAPI:
         )
 
         try:
-            from twilio.rest import Client as TwilioClient
-            twilio_client = TwilioClient(
-                settings.twilio_account_sid, settings.twilio_auth_token
-            )
-
             # Set forced scenario if provided
             if scenario:
                 _forced_scenario["value"] = scenario
@@ -2479,20 +2470,35 @@ def create_app() -> FastAPI:
             is_real_person = bool(to_number)
             dial_number = to_number or "+13185522502"  # Real person or test prospect
 
-            call = twilio_client.calls.create(
-                to=dial_number,
-                from_=settings.twilio_phone_number,
-                twiml=our_twiml,
+            # Use SignalWire for outbound call
+            sw = SignalWireTelephony(
+                project_id=settings.signalwire_project_id,
+                api_token=settings.signalwire_api_token,
+                space_name=settings.signalwire_space_name,
+                phone_number=settings.signalwire_phone_number,
+            )
+            call_sid = await sw.make_outbound_call(
+                to_number=dial_number,
+                call_id=call_id,
+                ws_url=ws_url,
             )
 
-            # Set Twilio client on bridge so transfer manager can make real calls
-            bridge.twilio_client = twilio_client
-            bridge.twilio_call_sid = call.sid
+            # Set SignalWire client on bridge so transfer manager can make real calls
+            from ..providers.signalwire_telephony import SignalWireClient
+            sw_client = SignalWireClient(
+                project_id=settings.signalwire_project_id,
+                api_token=settings.signalwire_api_token,
+                space_name=settings.signalwire_space_name,
+                phone_number=settings.signalwire_phone_number,
+            )
+            bridge.twilio_client = sw_client
+            bridge.twilio_call_sid = call_sid
             bridge.webhook_base_url = base_url
             bridge.prospect_name = prospect_name or ""  # Used in agent whisper
-            active_calls[call_id]["twilio_client"] = twilio_client
+            active_calls[call_id]["twilio_client"] = sw_client
+            active_calls[call_id]["telephony"] = sw
 
-            active_calls[call_id]["call_sid"] = call.sid
+            active_calls[call_id]["call_sid"] = call_sid
             active_calls[call_id]["is_real_person"] = is_real_person
             if not is_real_person:
                 active_calls[call_id]["test_prospect_number"] = dial_number
@@ -2500,14 +2506,14 @@ def create_app() -> FastAPI:
 
             logger.info("test_call_v2_initiated",
                 call_id=call_id,
-                call_sid=call.sid,
+                call_sid=call_sid,
                 to_number=dial_number,
                 is_real_person=is_real_person,
                 ws_url=ws_url)
 
             return {
                 "call_id": call_id,
-                "call_sid": call.sid,
+                "call_sid": call_sid,
                 "status": "initiated",
                 "to_number": dial_number,
                 "is_real_person": is_real_person,
