@@ -33,6 +33,7 @@ from ..pipelines.quality_pipeline import QualityPipeline
 from ..pipelines.orchestrator import AgentConfig
 from ..monitoring.metrics import metrics_collector
 from ..providers.twilio_telephony import TwilioTelephony
+from ..providers.vonage_telephony import VonageTelephony
 from ..warm_transfer import WarmTransferManager
 from ..transfer_endpoints import router as transfer_router
 from ..tenant_endpoints import router as tenant_router
@@ -404,34 +405,62 @@ def create_app() -> FastAPI:
             # Convert https:// to wss:// for WebSocket URL
             ws_url = base_url.replace("https://", "wss://").replace("http://", "ws://")
 
-            # Dial the prospect via Twilio
-            if request.phone_number and settings.twilio_account_sid:
-                twilio = TwilioTelephony(
-                    account_sid=settings.twilio_account_sid,
-                    auth_token=settings.twilio_auth_token,
-                    phone_number=settings.twilio_phone_number,
-                )
-                call_sid = await twilio.make_outbound_call(
-                    to_number=request.phone_number,
-                    call_id=call_id,
-                    ws_url=ws_url,
-                )
-                active_calls[call_id]["call_sid"] = call_sid
-                active_calls[call_id]["twilio_client"] = twilio.client
+            # Dial the prospect via configured telephony provider
+            if request.phone_number:
+                if settings.telephony_provider == "vonage" and settings.vonage_api_key:
+                    vonage = VonageTelephony(
+                        api_key=settings.vonage_api_key,
+                        api_secret=settings.vonage_api_secret,
+                        application_id=settings.vonage_application_id,
+                        private_key=settings.vonage_private_key,
+                        phone_number=settings.vonage_phone_number,
+                    )
+                    call_uuid = await vonage.make_outbound_call(
+                        to_number=request.phone_number,
+                        call_id=call_id,
+                        ws_url=ws_url,
+                    )
+                    active_calls[call_id]["call_sid"] = call_uuid
+                    active_calls[call_id]["vonage_telephony"] = vonage
 
-                # Wire up Twilio references for warm transfer + interruptions
-                if bridge:
-                    bridge.twilio_call_sid = call_sid
-                    bridge.twilio_client = twilio.client
-                    bridge.twilio_telephony = twilio  # For send_clear on barge-in
-                    bridge.webhook_base_url = base_url
+                    if bridge:
+                        bridge.twilio_call_sid = call_uuid  # Reuse field for call reference
+                        bridge.twilio_telephony = vonage     # Duck-typed: has send_clear()
+                        bridge.webhook_base_url = base_url
 
-                logger.info("twilio_call_initiated",
-                    call_id=call_id,
-                    call_sid=call_sid,
-                    to=request.phone_number,
-                    ws_url=ws_url,
-                )
+                    logger.info("vonage_call_initiated",
+                        call_id=call_id,
+                        call_uuid=call_uuid,
+                        to=request.phone_number,
+                        ws_url=ws_url,
+                    )
+
+                elif settings.twilio_account_sid:
+                    twilio = TwilioTelephony(
+                        account_sid=settings.twilio_account_sid,
+                        auth_token=settings.twilio_auth_token,
+                        phone_number=settings.twilio_phone_number,
+                    )
+                    call_sid = await twilio.make_outbound_call(
+                        to_number=request.phone_number,
+                        call_id=call_id,
+                        ws_url=ws_url,
+                    )
+                    active_calls[call_id]["call_sid"] = call_sid
+                    active_calls[call_id]["twilio_client"] = twilio.client
+
+                    if bridge:
+                        bridge.twilio_call_sid = call_sid
+                        bridge.twilio_client = twilio.client
+                        bridge.twilio_telephony = twilio
+                        bridge.webhook_base_url = base_url
+
+                    logger.info("twilio_call_initiated",
+                        call_id=call_id,
+                        call_sid=call_sid,
+                        to=request.phone_number,
+                        ws_url=ws_url,
+                    )
 
             metrics_collector.record_call_start(call_id, request.pipeline.value)
 
@@ -523,7 +552,13 @@ def create_app() -> FastAPI:
         providers["quality_pipeline"] = "ready" if quality_ready else "not_configured"
 
         # Check telephony provider
-        if settings.telephony_provider == "twilio":
+        if settings.telephony_provider == "vonage":
+            telephony_ready = bool(
+                settings.vonage_api_key
+                and settings.vonage_application_id
+                and settings.vonage_phone_number
+            )
+        elif settings.telephony_provider == "twilio":
             telephony_ready = bool(
                 settings.twilio_account_sid
                 and settings.twilio_auth_token
@@ -656,26 +691,38 @@ def create_app() -> FastAPI:
                 base_url = f"http://{settings.host}:{settings.port}"
         ws_url = base_url.replace("https://", "wss://").replace("http://", "ws://")
 
-        if settings.telephony_provider != "twilio":
-            logger.error("inbound_call_not_configured", provider=settings.telephony_provider)
-            return Response(
-                content='<?xml version="1.0" encoding="UTF-8"?><Response><Reject/></Response>',
-                media_type="application/xml",
-                status_code=403,
-            )
-
         try:
-            # Generate TwiML that connects to our media stream
-            twilio = TwilioTelephony(
-                account_sid=settings.twilio_account_sid,
-                auth_token=settings.twilio_auth_token,
-                phone_number=settings.twilio_phone_number,
-            )
-            twiml = twilio.generate_inbound_twiml(call_id, ws_url)
+            if settings.telephony_provider == "vonage":
+                # Vonage inbound: return NCCO JSON
+                vonage = VonageTelephony(
+                    api_key=settings.vonage_api_key,
+                    api_secret=settings.vonage_api_secret,
+                    application_id=settings.vonage_application_id,
+                    private_key=settings.vonage_private_key,
+                    phone_number=settings.vonage_phone_number,
+                )
+                ncco = vonage.generate_answer_ncco(call_id, ws_url)
+                logger.info("inbound_call_received", call_id=call_id, provider="vonage")
+                return JSONResponse(content=ncco)
 
-            logger.info("inbound_call_received", call_id=call_id)
+            elif settings.telephony_provider == "twilio":
+                # Twilio inbound: return TwiML XML
+                twilio = TwilioTelephony(
+                    account_sid=settings.twilio_account_sid,
+                    auth_token=settings.twilio_auth_token,
+                    phone_number=settings.twilio_phone_number,
+                )
+                twiml = twilio.generate_inbound_twiml(call_id, ws_url)
+                logger.info("inbound_call_received", call_id=call_id, provider="twilio")
+                return Response(content=twiml, media_type="application/xml")
 
-            return Response(content=twiml, media_type="application/xml")
+            else:
+                logger.error("inbound_call_not_configured", provider=settings.telephony_provider)
+                return Response(
+                    content='<?xml version="1.0" encoding="UTF-8"?><Response><Reject/></Response>',
+                    media_type="application/xml",
+                    status_code=403,
+                )
 
         except Exception as e:
             logger.error("inbound_call_error", error=str(e))
@@ -685,16 +732,17 @@ def create_app() -> FastAPI:
                 status_code=500,
             )
 
-    # ── WebSocket /v1/media-stream/{call_id} - Twilio Media Streams ──────
+    # ── WebSocket /v1/media-stream/{call_id} - Audio Media Streams ──────
     @app.websocket("/v1/media-stream/{call_id}")
-    async def twilio_media_stream(websocket: WebSocket, call_id: str):
+    async def media_stream(websocket: WebSocket, call_id: str):
         """
-        Twilio Media Streams WebSocket endpoint.
-        Handles real-time bidirectional audio in mulaw 8kHz format.
+        Media Streams WebSocket endpoint — supports both Twilio and Vonage.
+
+        Twilio: mulaw 8kHz JSON-wrapped base64 audio
+        Vonage: raw PCM 16kHz binary frames (no conversion needed)
 
         When a call is started via POST /v1/calls, the bridge is pre-created.
-        Twilio dials the prospect and connects here via WebSocket.
-        The bridge handles audio routing between Twilio and the orchestrator.
+        The telephony provider dials the prospect and connects here via WebSocket.
         """
         await websocket.accept()
 
@@ -855,15 +903,25 @@ def create_app() -> FastAPI:
                     bridge = None
                     call_data["bridge"] = None
 
-            twilio = TwilioTelephony(
-                account_sid=settings.twilio_account_sid,
-                auth_token=settings.twilio_auth_token,
-                phone_number=settings.twilio_phone_number,
-            )
+            # Instantiate the appropriate telephony handler
+            if settings.telephony_provider == "vonage":
+                telephony = VonageTelephony(
+                    api_key=settings.vonage_api_key,
+                    api_secret=settings.vonage_api_secret,
+                    application_id=settings.vonage_application_id,
+                    private_key=settings.vonage_private_key,
+                    phone_number=settings.vonage_phone_number,
+                )
+            else:
+                telephony = TwilioTelephony(
+                    account_sid=settings.twilio_account_sid,
+                    auth_token=settings.twilio_auth_token,
+                    phone_number=settings.twilio_phone_number,
+                )
 
             if bridge:
-                # Wire Twilio telephony for clear messages on barge-in
-                bridge.twilio_telephony = twilio
+                # Wire telephony for clear messages on barge-in (duck-typed)
+                bridge.twilio_telephony = telephony
                 # Start the bridge (greeting audio is pre-synthesized — plays instantly)
                 await bridge.start()
 
@@ -882,7 +940,7 @@ def create_app() -> FastAPI:
                     return None
 
             # Handle the media stream (blocks until call ends)
-            await twilio.handle_media_stream(websocket, call_id, on_audio, get_audio)
+            await telephony.handle_media_stream(websocket, call_id, on_audio, get_audio)
 
         except Exception as e:
             logger.error("media_stream_error", call_id=call_id, error=str(e))

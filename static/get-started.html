@@ -125,7 +125,7 @@
         .plan-original{font-size:.85rem;color:var(--text3);text-decoration:line-through;margin-bottom:4px}
         .plan-savings{font-size:.8rem;color:var(--green);font-weight:600}
         .plan-desc{font-size:.8rem;color:var(--text3);margin-top:6px}
-        @media(max-width:500px){.plans{grid-template-columns:1fr}}
+        @media(max-width:700px){.plans{grid-template-columns:1fr!important;max-width:320px;margin-left:auto;margin-right:auto}}
 
         /* Form */
         .form-group{margin-bottom:18px}
@@ -254,7 +254,7 @@
         <div class="stage-header">
             <div class="stage-step">Step 3 of 4 — Activate</div>
             <h1>Put your AI employees to work</h1>
-            <p>Choose a plan and activate today. 50% off your first month — limited time.</p>
+            <p>Choose a plan to activate. 50% off your first month — limited time launch special.</p>
         </div>
 
         <div class="discount-banner">
@@ -262,21 +262,35 @@
             <div class="msg">50% off your first month — locks in today</div>
         </div>
 
-        <div class="plans">
-            <div class="plan" data-plan="starter" onclick="pickPlan(this)">
-                <div class="plan-name">Starter</div>
-                <div class="plan-original">$0.10/min</div>
-                <div class="plan-price">$0.05<span>/min</span></div>
-                <div class="plan-savings">Save 50% first month</div>
-                <div class="plan-desc">Pay as you go. $0 platform fee.</div>
+        <div style="text-align:center;margin-bottom:16px">
+            <div style="display:inline-flex;background:var(--bg3);border-radius:6px;padding:2px;gap:2px" id="funnel-billing-toggle">
+                <button onclick="setFunnelBilling('monthly')" class="fbill active" id="fbill-monthly" style="padding:6px 16px;border-radius:5px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:all .2s;background:var(--cyan);color:var(--bg)">Monthly</button>
+                <button onclick="setFunnelBilling('annual')" class="fbill" id="fbill-annual" style="padding:6px 16px;border-radius:5px;border:none;cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:600;transition:all .2s;background:transparent;color:var(--text2)">Annual <span style="color:var(--green);font-size:.7rem">2 mo free</span></button>
             </div>
-            <div class="plan featured selected" data-plan="agency" onclick="pickPlan(this)">
-                <div class="plan-badge">Best Value</div>
+        </div>
+
+        <div class="plans" style="grid-template-columns:repeat(3,1fr)">
+            <div class="plan" data-plan="starter" onclick="pickPlan(this)">
+                <div class="plan-name">Launch</div>
+                <div class="plan-original" id="fp-starter-orig">$497/mo</div>
+                <div class="plan-price" id="fp-starter">$249<span>/mo</span></div>
+                <div class="plan-savings">50% off first month</div>
+                <div class="plan-desc">2,000 min included<br>then $0.25/min · all-in</div>
+            </div>
+            <div class="plan featured selected" data-plan="growth" onclick="pickPlan(this)">
+                <div class="plan-badge">Most Popular</div>
+                <div class="plan-name">Scale</div>
+                <div class="plan-original" id="fp-growth-orig">$1,497/mo</div>
+                <div class="plan-price" id="fp-growth">$749<span>/mo</span></div>
+                <div class="plan-savings">50% off first month</div>
+                <div class="plan-desc">7,500 min included<br>then $0.20/min · all-in</div>
+            </div>
+            <div class="plan" data-plan="agency" onclick="pickPlan(this)">
                 <div class="plan-name">Agency</div>
-                <div class="plan-original">$0.08/min</div>
-                <div class="plan-price">$0.04<span>/min</span></div>
-                <div class="plan-savings">Save 50% first month</div>
-                <div class="plan-desc">Full whitelabel. $0/mo platform fee.</div>
+                <div class="plan-original" id="fp-agency-orig">$3,997/mo</div>
+                <div class="plan-price" id="fp-agency">$1,999<span>/mo</span></div>
+                <div class="plan-savings">50% off first month</div>
+                <div class="plan-desc">25,000 min included<br>then $0.16/min · whitelabel</div>
             </div>
         </div>
 
@@ -297,7 +311,7 @@
         </button>
         <div class="trust-row">
             <div class="trust-item">🔒 Secure checkout via Stripe</div>
-            <div class="trust-item">↩️ Cancel anytime</div>
+            <div class="trust-item">↩️ Cancel anytime after month 1</div>
             <div class="trust-item">🔥 50% off first month</div>
         </div>
         <button class="btn-ghost" style="width:100%;margin-top:8px" onclick="showStage(3)">← Back to AI employees</button>
@@ -334,7 +348,7 @@
 
 <script>
 const API = '';  // Same origin
-let state = { url: '', analysis: null, plan: 'agency', demos: {} };
+let state = { url: '', analysis: null, plan: 'growth', billing: 'monthly', demos: {} };
 
 // ── Stage Navigation ─────────────────────────────────────────────────
 function showStage(n) {
@@ -613,6 +627,22 @@ function pickPlan(el) {
     state.plan = el.dataset.plan;
 }
 
+const funnelPrices = {
+    monthly: { starter: { full: '$497/mo', half: '$249', orig: '$497/mo' }, growth: { full: '$1,497/mo', half: '$749', orig: '$1,497/mo' }, agency: { full: '$3,997/mo', half: '$1,999', orig: '$3,997/mo' } },
+    annual:  { starter: { full: '$414/mo', half: '$207', orig: '$414/mo' }, growth: { full: '$1,248/mo', half: '$624', orig: '$1,248/mo' }, agency: { full: '$3,331/mo', half: '$1,666', orig: '$3,331/mo' } }
+};
+function setFunnelBilling(period) {
+    state.billing = period;
+    ['starter','growth','agency'].forEach(p => {
+        const d = funnelPrices[period][p];
+        document.getElementById('fp-'+p+'-orig').textContent = d.orig;
+        document.getElementById('fp-'+p).innerHTML = d.half + '<span>/mo</span>';
+    });
+    const mBtn = document.getElementById('fbill-monthly'), aBtn = document.getElementById('fbill-annual');
+    if (period === 'annual') { aBtn.style.background='var(--cyan)'; aBtn.style.color='var(--bg)'; mBtn.style.background='transparent'; mBtn.style.color='var(--text2)'; }
+    else { mBtn.style.background='var(--cyan)'; mBtn.style.color='var(--bg)'; aBtn.style.background='transparent'; aBtn.style.color='var(--text2)'; }
+}
+
 async function startCheckout() {
     const email = document.getElementById('f-email').value.trim();
     const first = document.getElementById('f-first').value.trim();
@@ -638,6 +668,7 @@ async function startCheckout() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 plan: state.plan,
+                billing: state.billing,
                 email: email,
                 business_name: company,
             }),
@@ -654,7 +685,7 @@ async function startCheckout() {
                 'Name: ' + first + ' ' + last + '\n' +
                 'Email: ' + email + '\n' +
                 'Company: ' + (company || 'N/A') + '\n' +
-                'Plan: ' + state.plan + ' (50% off first month)\n' +
+                'Plan: ' + state.plan + ' (' + state.billing + ', 50% off first month)\n' +
                 'Website: ' + (state.url || 'N/A') + '\n' +
                 'Industry: ' + (state.analysis?.industry || 'N/A') + '\n' +
                 'AI Employees: ' + (state.analysis?.employees?.map(e => e.name + ' — ' + e.title).join(', ') || 'N/A') + '\n'

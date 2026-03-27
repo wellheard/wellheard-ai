@@ -57,7 +57,7 @@ class Settings(BaseSettings):
     cartesia_emotion: str = "happy"
 
     # ── Telephony Provider Selection ───────────────────────────────────────
-    telephony_provider: str = "twilio"  # "twilio" or "telnyx"
+    telephony_provider: str = "vonage"  # "twilio", "telnyx", or "vonage"
 
     # ── Twilio ─────────────────────────────────────────────────────────────
     twilio_account_sid: str = ""
@@ -83,7 +83,14 @@ class Settings(BaseSettings):
     stripe_price_agency: str = ""        # Stripe Price ID for Agency plan
     stripe_coupon_50off: str = ""        # Stripe Coupon ID for 50% off first month
 
-    # ── Telnyx (Telephony) ───────────────────────────────────────────────
+    # ── Vonage (Telephony — preferred, Brightcall negotiated rates) ──────
+    vonage_api_key: str = ""              # Vonage API key (e.g., from Brightcall account)
+    vonage_api_secret: str = ""           # Vonage API secret
+    vonage_application_id: str = ""       # Vonage Application ID (for JWT auth)
+    vonage_private_key: str = ""          # RSA private key string (for JWT signing)
+    vonage_phone_number: str = ""         # Outbound caller ID
+
+    # ── Telnyx (Telephony — legacy) ─────────────────────────────────────
     telnyx_api_key: str = ""
     telnyx_connection_id: str = ""
     telnyx_phone_number: str = ""
