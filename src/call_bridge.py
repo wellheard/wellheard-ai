@@ -2438,6 +2438,15 @@ class CallBridge:
         """
         t0 = time.time()
 
+        # Guard: Don't process normal LLM turns during active transfer hold.
+        # The transfer hold loop handles all communication during this phase.
+        # Without this guard, prospect speech during hold triggers the LLM to generate
+        # out-of-context responses (e.g., re-asking bank account questions).
+        if self._transfer_manager and self._transfer_manager.is_transferring:
+            logger.info("text_turn_skipped_during_transfer",
+                call_id=self.call_id, turn=turn_number, transcript=transcript[:80])
+            return
+
         # FREEZE silence clock — AI is generating a response.
         # Without this, LLM+TTS processing time (3-6s) counts as "silence"
         # and the nudge fires while the AI's audio is still playing.
@@ -3222,8 +3231,11 @@ class CallBridge:
         # Register in the global transfer registry so webhooks can find it
         register_transfer_manager(self.call_id, self._transfer_manager)
 
-        # Pause silence management during transfer hold
+        # Pause silence management AND recovery watchdog during transfer hold
+        # Without this, recovery prompts ("Hey, are you still there?") fire during
+        # the transfer wait, breaking the hold audio experience.
         self._silence_manager.pause()
+        self._recovery.pause()
 
         logger.info("transfer_initiating",
             call_id=self.call_id,
@@ -3329,6 +3341,7 @@ class CallBridge:
                 # to prevent the LLM from triggering another transfer loop.
                 self._transfer_failed = True
                 self._silence_manager.resume()
+                self._recovery.resume()
                 return
 
             # ── Priority 3: Check max hold time ──
@@ -3342,6 +3355,7 @@ class CallBridge:
                 # Mark transfer as permanently failed — do NOT reset _transfer_initiated
                 self._transfer_failed = True
                 self._silence_manager.resume()
+                self._recovery.resume()
                 return
 
             # ── Play pre-synthesized hold audio at intervals ──

@@ -118,6 +118,7 @@ class ConversationRecovery:
 
         # State tracking
         self._active = False
+        self._paused = False  # Pause during transfer hold — prevents watchdog firing
         self._last_ai_response_time = 0.0
         self._last_prospect_speech_time = 0.0
         self._watchdog_task: Optional[asyncio.Task] = None
@@ -164,6 +165,21 @@ class ConversationRecovery:
         logger.info("conversation_recovery_stopped",
             call_id=self.call_id,
             metrics=self.metrics.__dict__)
+
+    def pause(self):
+        """Pause watchdog monitoring (e.g., during transfer hold).
+        Prevents recovery prompts from firing during transfer wait."""
+        self._paused = True
+        logger.debug("conversation_recovery_paused", call_id=self.call_id)
+
+    def resume(self):
+        """Resume watchdog monitoring after transfer completes/fails.
+        Resets timers to avoid immediate false triggers."""
+        self._paused = False
+        now = time.time()
+        self._last_ai_response_time = now
+        self._last_prospect_speech_time = now
+        logger.debug("conversation_recovery_resumed", call_id=self.call_id)
 
     def set_recovery_audio(self, phrase_key: str, audio_bytes: Optional[bytes]):
         """Set pre-synthesized audio for a recovery phrase.
@@ -339,6 +355,10 @@ class ConversationRecovery:
                 await asyncio.sleep(0.5)
                 if not self._active:
                     break
+
+                # Skip watchdog checks while paused (e.g., during transfer hold)
+                if self._paused:
+                    continue
 
                 now = time.time()
                 ai_silent = now - self._last_ai_response_time

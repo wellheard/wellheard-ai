@@ -229,14 +229,13 @@ class CallStateTracker:
                 self.bank_account_type = "yes"
                 self.advance_step()
 
-            # If assistant is talking about transfer/agent but bank account wasn't asked,
-            # do NOT auto-advance. The LLM must ask about bank account first.
-            # Only advance if bank account info was actually obtained.
-            if self.current_step == ScriptStep.BANK_ACCOUNT and \
-               any(w in asst_lower for w in ["licensed agent", "transfer", "connecting you",
-                                              "agent standing by"]):
+            # If assistant is talking about transfer/agent and we still haven't advanced,
+            # check if bank account was already collected in a prior turn.
+            # Use elif to prevent double-advancing within the same update_from_exchange call.
+            elif any(w in asst_lower for w in ["licensed agent", "transfer", "connecting you",
+                                                "agent standing by"]):
                 if self.has_bank_account is not None:
-                    # Bank account was answered — safe to advance
+                    # Bank account was answered in a prior turn — safe to advance
                     self.advance_step()
                 # else: bank account not yet answered — stay on step 2
 
