@@ -3162,6 +3162,58 @@ Generate 2-4 AI employees that would be most valuable for THIS specific business
                 "message": "Payment processing encountered an error. We'll follow up via email.",
             }
 
+    # ── Text Simulation Endpoints ──────────────────────────────────────────
+
+    @app.post("/v1/test-call-text", tags=["Testing"])
+    async def test_call_text(
+        scenario: Optional[str] = None,
+        direction: str = "outbound",
+        api_key: str = Depends(verify_api_key),
+    ):
+        """
+        Run a text-level call simulation (LLM-to-LLM, no telephony).
+
+        Much faster than real calls (~2-5 seconds per scenario).
+        Tests conversation logic: script adherence, objection handling,
+        step progression, repetition, brevity, compliance.
+
+        Pass ?scenario=easy_close to force a specific scenario.
+        Pass ?direction=inbound for inbound simulation.
+        """
+        from ..text_simulator import run_text_simulation
+
+        result = await run_text_simulation(
+            scenario_name=scenario,
+            direction=direction,
+        )
+
+        return {
+            "scenario": result.scenario,
+            "scenario_name": result.scenario_name,
+            "persona": result.persona,
+            "grade": result.grade,
+            "transcript": result.full_transcript,
+            "total_turns": result.total_turns,
+            "end_reason": result.end_reason,
+            "step_reached": result.step_reached,
+            "avg_becky_words": round(result.avg_becky_words, 1),
+            "duration_ms": round(result.duration_ms),
+        }
+
+    @app.post("/v1/test-call-text/all", tags=["Testing"])
+    async def test_call_text_all(
+        direction: str = "outbound",
+        api_key: str = Depends(verify_api_key),
+    ):
+        """
+        Run ALL 6 scenarios and return aggregated results with grades.
+
+        Returns per-scenario grades, transcripts, and improvement recommendations.
+        """
+        from ..text_simulator import run_all_scenarios
+
+        return await run_all_scenarios(direction=direction)
+
     return app
 
 
