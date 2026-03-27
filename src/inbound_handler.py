@@ -27,8 +27,8 @@ from src.warm_transfer import WarmTransferManager, TransferConfig
 VOICE_ID = "734b0cda-9091-4144-9d4d-f33ffc2cc025"  # Vicky (cloned)
 VOICE_NAME = "Vicky"
 MODEL = "sonic-3"
-SPEED = 0.95  # Slightly slower than 1.0 = calmer, more authoritative, trustworthy
-EMOTION = "confident"  # Warm authority — calm confidence (Cartesia Sonic-3 literal emotion)
+SPEED = 1.0  # Natural speed — not slowed (0.95 was causing unnatural pauses)
+EMOTION = "content"  # Warm, calm, natural tone (Cartesia Sonic-3 literal emotion)
 LANGUAGE = "en"
 TEMPERATURE = 0.7
 MAX_TOKENS = 60  # Allow slightly longer responses for explaining the offer properly

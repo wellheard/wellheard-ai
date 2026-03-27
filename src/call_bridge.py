@@ -1893,11 +1893,16 @@ class CallBridge:
             # During echo zone, sends silence instead of real audio.
             async def audio_feeder() -> AsyncIterator[bytes]:
                 silence_frame = b'\x00' * 640  # 20ms silence at 16kHz 16-bit
+                real_audio_count = 0
+                echo_suppressed_count = 0
+                silence_count = 0
+                timeout_count = 0
                 while self._active and self._call_phase == "converse":
                     try:
                         chunk = await asyncio.wait_for(
                             self._input_queue.get(), timeout=0.5)
                     except asyncio.TimeoutError:
+                        timeout_count += 1
                         yield silence_frame  # Keep Deepgram alive
                         continue
 
@@ -1905,6 +1910,13 @@ class CallBridge:
                         return  # Call ended
 
                     if self._in_echo_zone():
+                        echo_suppressed_count += 1
+                        if echo_suppressed_count in (1, 50, 200, 500):
+                            logger.info("audio_feeder_echo_suppressed",
+                                call_id=self.call_id,
+                                count=echo_suppressed_count,
+                                ai_speaking=self._ai_speaking,
+                                echo_ended_ago_ms=round((time.time() - self._ai_speech_ended_at) * 1000) if self._ai_speech_ended_at else 0)
                         yield silence_frame  # Suppress echo
                         continue
 
@@ -1913,6 +1925,7 @@ class CallBridge:
                     # (the backchannel audio itself will be output separately)
                     rms = self._audio_rms(chunk)
                     if rms < self._speech_energy_threshold:
+                        silence_count += 1
                         # This is a silence frame — check for backchannel opportunity
                         if await self._try_inject_backchannel(chunk):
                             # Backchannel was injected — suppress this silence frame
@@ -1920,6 +1933,15 @@ class CallBridge:
                             yield silence_frame
                             continue
 
+                    real_audio_count += 1
+                    if real_audio_count in (1, 10, 50, 200):
+                        logger.info("audio_feeder_real_audio",
+                            call_id=self.call_id,
+                            real=real_audio_count,
+                            echo_suppressed=echo_suppressed_count,
+                            silence=silence_count,
+                            timeout=timeout_count,
+                            rms=round(rms, 0))
                     yield chunk  # Real audio → Deepgram
 
             # Multi-stage silence management — escalates through nudge → check-in → exit

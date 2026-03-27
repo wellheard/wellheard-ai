@@ -50,8 +50,8 @@ BACKCHANNELS: Set[str] = {
 @dataclass
 class SilenceConfig:
     """Thresholds for 2-stage silence management."""
-    nudge_after_s: float = 8.0    # Increased from 6s — give prospect time to think
-    exit_after_nudge_s: float = 6.0  # Increased from 4s — more patient after nudge
+    nudge_after_s: float = 12.0   # 12s before first nudge — gives prospect time after pitch
+    exit_after_nudge_s: float = 8.0  # 8s after nudge before exit — very patient
     hold_timeout_s: float = 30.0  # Max wait when prospect says "hold on"
 
     nudge_phrases: list = field(default_factory=lambda: [
