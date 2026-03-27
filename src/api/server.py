@@ -719,6 +719,25 @@ def create_app() -> FastAPI:
             if call_id in call_websockets:
                 call_websockets[call_id].remove(websocket)
 
+    # ── POST /v1/calls/status — Call status callback ────────────────────
+    @app.post("/v1/calls/status", tags=["Telephony"])
+    async def handle_call_status(request: Request):
+        """Handle SignalWire/Twilio call status callbacks (completed, busy, etc.)."""
+        form = await request.form()
+        call_sid = form.get("CallSid", "")
+        call_status = form.get("CallStatus", "")
+        logger.info("call_status_callback",
+            call_sid=call_sid, status=call_status,
+            duration=form.get("CallDuration", ""))
+        # Clean up active calls if completed
+        if call_status in ("completed", "busy", "no-answer", "canceled", "failed"):
+            for cid, cdata in list(active_calls.items()):
+                if cdata.get("call_sid") == call_sid:
+                    logger.info("call_ended_via_status",
+                        call_id=cid, status=call_status)
+                    break
+        return Response(content="", media_type="text/plain", status_code=200)
+
     # ── POST /v1/calls/inbound - Twilio inbound webhook ──────────────────
     @app.post("/v1/calls/inbound", tags=["Telephony"])
     async def handle_inbound_call(request: Request):
