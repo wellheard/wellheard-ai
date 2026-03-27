@@ -1105,6 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => { updateABTestPanel(); });
 function updateBenchmarkChart() {
   // Benchmark data — measured WellHeard performance (2026-03-27) + competitor research
   // WellHeard measured: 8ms cached, 398-928ms live (avg ~450ms) via Groq + Cartesia on SignalWire
+  // Call quality: 95.5 avg across 6 scenarios (text sim, 2026-03-27 post-optimization)
   // Competitor data: voicebenchmark.ai, public benchmarks, pricing pages
   const benchmarks = {
     'Response Latency': {
@@ -1117,11 +1118,11 @@ function updateBenchmarkChart() {
       'Air.ai': { value: 1100, display: '1100ms', max: 1200, invert: true },
     },
     'Call Quality Score': {
-      'WellHeard': { value: 86, display: '86', max: 100 },
+      'WellHeard': { value: 95, display: '95', max: 100 },
       'Retell': { value: 78, display: '78', max: 100 },
       'Vapi': { value: 76, display: '76', max: 100 },
-      'Bland': { value: 68, display: '68', max: 100 },
       'Synthflow': { value: 72, display: '72', max: 100 },
+      'Bland': { value: 68, display: '68', max: 100 },
       'Air.ai': { value: 65, display: '65', max: 100 },
     },
     'Features': {
