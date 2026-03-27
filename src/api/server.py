@@ -60,8 +60,19 @@ call_websockets: dict[str, list[WebSocket]] = {}
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────
+# Supports multiple API keys (comma-separated in HV_API_KEY env var)
+# e.g. HV_API_KEY="wh-internal-xxx,wh-brightcall-yyy"
+_valid_api_keys = set()
+
+def _load_api_keys():
+    global _valid_api_keys
+    raw = settings.api_key or ""
+    _valid_api_keys = {k.strip() for k in raw.split(",") if k.strip()}
+
 async def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    if credentials.credentials != settings.api_key:
+    if not _valid_api_keys:
+        _load_api_keys()
+    if credentials.credentials not in _valid_api_keys:
         raise HTTPException(status_code=401, detail="Invalid API key")
     return credentials.credentials
 

@@ -47,7 +47,7 @@ steps:
       - '--port=8000'
       - '--concurrency=1'
       - '--min-instances=1'
-      - '--max-instances=100'
+      - '--max-instances=20'
       - '--timeout=3600s'
       - '--cpu=1'
       - '--memory=512Mi'
@@ -69,8 +69,4 @@ options:
   logging: CLOUD_LOGGING_ONLY
   machineType: 'N1_HIGHCPU_8'
 
-# Substitutions for custom values
-substitutions:
-  _REGION: 'us-east1'
-  _SERVICE_NAME: 'wellheard-ai'
-  _ARTIFACT_REPO: 'wellheard'
+# No substitutions needed — values are inlined above
