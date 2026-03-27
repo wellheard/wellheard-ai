@@ -761,6 +761,12 @@ def create_app() -> FastAPI:
             return await test_answer_twiml()
 
         call_id = str(uuid.uuid4())
+        inbound_call_sid = form_data.get("CallSid", "")
+
+        # Store mapping from call_id to inbound call SID for transfer support
+        if inbound_call_sid:
+            # Will be picked up when media stream connects
+            active_calls[call_id] = {"inbound_call_sid": inbound_call_sid}
 
         # Build WebSocket URL from base_url
         import os
@@ -1026,6 +1032,24 @@ def create_app() -> FastAPI:
             if bridge:
                 # Wire telephony for clear messages on barge-in (duck-typed)
                 bridge.twilio_telephony = telephony
+                bridge.webhook_base_url = base_url
+
+                # For inbound calls: set up SignalWire client for warm transfers
+                if call_data.get("direction") == "inbound" and settings.telephony_provider == "signalwire":
+                    from ..providers.signalwire_telephony import SignalWireClient
+                    bridge.twilio_client = SignalWireClient(
+                        project_id=settings.signalwire_project_id,
+                        api_token=settings.signalwire_api_token,
+                        space_name=settings.signalwire_space_name,
+                        phone_number=settings.signalwire_phone_number,
+                    )
+                    # Set the inbound call SID (captured from webhook) for transfers
+                    inbound_sid = call_data.get("inbound_call_sid", "")
+                    if inbound_sid:
+                        bridge.twilio_call_sid = inbound_sid
+                        logger.info("inbound_call_sid_set",
+                            call_id=call_id, call_sid=inbound_sid)
+
                 # Start the bridge (greeting audio is pre-synthesized — plays instantly)
                 await bridge.start()
 

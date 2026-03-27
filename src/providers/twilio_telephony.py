@@ -185,12 +185,18 @@ class TwilioTelephony:
 
                 elif event == "start":
                     # Capture the streamSid — REQUIRED for sending audio back
-                    sid = data.get("start", {}).get("streamSid", "")
+                    start_data = data.get("start", {})
+                    sid = start_data.get("streamSid", "")
+                    call_sid_from_stream = start_data.get("callSid", "")
                     stream_sid["value"] = sid
                     stream_sid_ready.set()  # Signal the send loop
-                    self._active_streams[call_id] = {"stream_sid": sid}
+                    self._active_streams[call_id] = {
+                        "stream_sid": sid,
+                        "call_sid": call_sid_from_stream,
+                    }
                     logger.info("twilio_media_stream_started",
-                        call_id=call_id, stream_sid=sid)
+                        call_id=call_id, stream_sid=sid,
+                        call_sid=call_sid_from_stream)
 
                 elif event == "media":
                     payload = data.get("media", {}).get("payload")
