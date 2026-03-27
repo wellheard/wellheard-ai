@@ -175,10 +175,17 @@ class SignalWireTelephony(TwilioTelephony):
                 data["AsyncAmdStatusCallback"] = amd_callback_url
                 data["AsyncAmdStatusCallbackMethod"] = "POST"
 
+        # CRITICAL: Use content= with manual URL encoding instead of data=
+        # because httpx's form encoding treats '+' as space (per spec).
+        # Phone numbers like +19802987574 become " 19802987574" → "To invalid format".
+        from urllib.parse import urlencode, quote_plus
+        encoded_body = urlencode(data, quote_via=quote_plus)
+
         async with httpx.AsyncClient() as client:
             resp = await client.post(
                 f"{self._base_url}/Calls.json",
-                data=data,
+                content=encoded_body,
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
                 auth=(self.project_id, self.api_token),
                 timeout=15,
             )
