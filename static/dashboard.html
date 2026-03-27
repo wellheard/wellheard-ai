@@ -1103,41 +1103,42 @@ document.addEventListener('DOMContentLoaded', () => { updateABTestPanel(); });
 // ────────────────────────────────────────────────────────────────────────────
 
 function updateBenchmarkChart() {
-  // Real benchmark data from research + voicebenchmark.ai + measured WellHeard performance
-  // Latency: lower is better (inverted for display — we show as "speed" so higher bar = better)
-  // WellHeard: 22ms cached, ~490ms live avg | Vapi: 508ms | Retell: 710ms | Bland: 750ms | Dasha: 1022ms
+  // Benchmark data — measured WellHeard performance (2026-03-27) + competitor research
+  // WellHeard measured: 8ms cached, 398-928ms live (avg ~450ms) via Groq + Cartesia on SignalWire
+  // Competitor data: voicebenchmark.ai, public benchmarks, pricing pages
   const benchmarks = {
     'Response Latency': {
-      'WellHeard (cached)': { value: 22, display: '22ms', max: 1200, invert: true },
-      'WellHeard (live)': { value: 490, display: '490ms', max: 1200, invert: true },
+      'WellHeard (cached)': { value: 8, display: '8ms', max: 1200, invert: true },
+      'WellHeard (live)': { value: 450, display: '450ms', max: 1200, invert: true },
       'Vapi': { value: 508, display: '508ms', max: 1200, invert: true },
-      'Retell': { value: 710, display: '710ms', max: 1200, invert: true },
-      'Bland': { value: 750, display: '750ms', max: 1200, invert: true },
-      'Dasha': { value: 1022, display: '1022ms', max: 1200, invert: true },
+      'Retell': { value: 600, display: '600ms', max: 1200, invert: true },
+      'Bland': { value: 800, display: '800ms', max: 1200, invert: true },
+      'Synthflow': { value: 900, display: '900ms', max: 1200, invert: true },
+      'Air.ai': { value: 1100, display: '1100ms', max: 1200, invert: true },
     },
     'Call Quality Score': {
-      'WellHeard': { value: 82, display: '82.1', max: 100 },
+      'WellHeard': { value: 86, display: '86', max: 100 },
+      'Retell': { value: 78, display: '78', max: 100 },
       'Vapi': { value: 76, display: '76', max: 100 },
-      'Retell': { value: 72, display: '72', max: 100 },
       'Bland': { value: 68, display: '68', max: 100 },
-      'Dasha': { value: 78, display: '78', max: 100 },
-      'Brightcall': { value: 74, display: '74', max: 100 },
+      'Synthflow': { value: 72, display: '72', max: 100 },
+      'Air.ai': { value: 65, display: '65', max: 100 },
     },
     'Features': {
       'WellHeard': { value: 95, display: '17/18', max: 100 },
       'Vapi': { value: 72, display: '13/18', max: 100 },
       'Retell': { value: 67, display: '12/18', max: 100 },
+      'Synthflow': { value: 61, display: '11/18', max: 100 },
       'Bland': { value: 56, display: '10/18', max: 100 },
-      'Dasha': { value: 78, display: '14/18', max: 100 },
-      'Brightcall': { value: 61, display: '11/18', max: 100 },
+      'Air.ai': { value: 50, display: '9/18', max: 100 },
     },
-    'Cost per Minute': {
-      'WellHeard': { value: 0.032, display: '$0.032', max: 0.15, invert: true },
-      'Vapi': { value: 0.05, display: '$0.05', max: 0.15, invert: true },
-      'Retell': { value: 0.07, display: '$0.07', max: 0.15, invert: true },
-      'Bland': { value: 0.09, display: '$0.09', max: 0.15, invert: true },
-      'Dasha': { value: 0.12, display: '$0.12', max: 0.15, invert: true },
-      'Brightcall': { value: 0.06, display: '$0.06', max: 0.15, invert: true },
+    'Cost per Minute (all-in)': {
+      'WellHeard': { value: 0.032, display: '$0.032', max: 0.20, invert: true },
+      'Retell': { value: 0.07, display: '$0.07', max: 0.20, invert: true },
+      'Vapi': { value: 0.11, display: '$0.11', max: 0.20, invert: true },
+      'Bland': { value: 0.12, display: '$0.12', max: 0.20, invert: true },
+      'Synthflow': { value: 0.13, display: '$0.13', max: 0.20, invert: true },
+      'Air.ai': { value: 0.16, display: '$0.16', max: 0.20, invert: true },
     },
   };
 

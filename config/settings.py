@@ -57,7 +57,13 @@ class Settings(BaseSettings):
     cartesia_emotion: str = "happy"
 
     # ── Telephony Provider Selection ───────────────────────────────────────
-    telephony_provider: str = "vonage"  # "twilio", "telnyx", or "vonage"
+    telephony_provider: str = "signalwire"  # "twilio", "telnyx", "vonage", or "signalwire"
+
+    # ── SignalWire (Telephony — active) ──────────────────────────────────
+    signalwire_project_id: str = ""       # SignalWire Project ID
+    signalwire_api_token: str = ""        # SignalWire API Token
+    signalwire_space_name: str = ""       # SignalWire Space (e.g., "wellheard")
+    signalwire_phone_number: str = ""     # Outbound caller ID
 
     # ── Twilio ─────────────────────────────────────────────────────────────
     twilio_account_sid: str = ""

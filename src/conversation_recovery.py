@@ -40,9 +40,9 @@ class CallState(str, Enum):
 class RecoveryConfig:
     """Configuration for conversation recovery behavior."""
     # Watchdog timing
-    watchdog_ai_timeout_s: float = 8.0      # If AI hasn't spoken for 8s
-    watchdog_prospect_timeout_s: float = 5.0  # And prospect hasn't spoken for 5s
-    second_recovery_delay_s: float = 10.0     # Time before second recovery attempt
+    watchdog_ai_timeout_s: float = 12.0     # If AI hasn't spoken for 12s (increased from 8)
+    watchdog_prospect_timeout_s: float = 8.0  # And prospect hasn't spoken for 8s (increased from 5)
+    second_recovery_delay_s: float = 15.0     # Time before second recovery attempt (increased from 10)
 
     # LLM timeout fallback
     llm_timeout_s: float = 4.0  # LLM response timeout

@@ -34,6 +34,7 @@ from ..pipelines.orchestrator import AgentConfig
 from ..monitoring.metrics import metrics_collector
 from ..providers.twilio_telephony import TwilioTelephony
 from ..providers.vonage_telephony import VonageTelephony
+from ..providers.signalwire_telephony import SignalWireTelephony
 from ..warm_transfer import WarmTransferManager
 from ..transfer_endpoints import router as transfer_router
 from ..tenant_endpoints import router as tenant_router
@@ -228,13 +229,6 @@ def create_app() -> FastAPI:
         call_id = str(uuid.uuid4())
 
         # Create the appropriate pipeline
-        if request.pipeline == APIPipelineMode.BUDGET:
-            orchestrator = BudgetPipeline.create()
-            estimated_cost = BudgetPipeline.ESTIMATED_COST_PER_MINUTE
-        else:
-            orchestrator = QualityPipeline.create()
-            estimated_cost = QualityPipeline.ESTIMATED_COST_PER_MINUTE
-
         # Configure the agent — resolve preset configs by agent_id
         from ..inbound_handler import OUTBOUND_CONFIG, INBOUND_CONFIG
         AGENT_PRESETS = {
@@ -242,6 +236,7 @@ def create_app() -> FastAPI:
             "inbound_sdr_becky": INBOUND_CONFIG,
             "inbound_final_expense": INBOUND_CONFIG,  # legacy alias
             "final-expense-becky": OUTBOUND_CONFIG,   # API alias
+            "default": OUTBOUND_CONFIG,                # Default outbound = Becky SDR
         }
 
         preset = AGENT_PRESETS.get(request.agent.agent_id)
@@ -259,6 +254,7 @@ def create_app() -> FastAPI:
                 pitch_text=preset.get("pitch_text", ""),
                 transfer_config=preset.get("transfer_config"),
                 tools=request.agent.tools,
+                speed=preset.get("speed", 1.0),
             )
             logger.info("agent_preset_loaded",
                 call_id=call_id,
@@ -278,6 +274,18 @@ def create_app() -> FastAPI:
                 greeting=request.agent.greeting,
                 tools=request.agent.tools,
             )
+
+        # Create pipeline — auto-upgrade to quality when Cartesia voice is configured
+        use_quality = (
+            request.pipeline == APIPipelineMode.QUALITY
+            or (agent_config.voice_id and agent_config.voice_id != "")
+        )
+        if use_quality:
+            orchestrator = QualityPipeline.create()
+            estimated_cost = QualityPipeline.ESTIMATED_COST_PER_MINUTE
+        else:
+            orchestrator = BudgetPipeline.create()
+            estimated_cost = BudgetPipeline.ESTIMATED_COST_PER_MINUTE
 
         # Apply A/B test overrides if experiment_name is provided in request
         ab_test_experiment = getattr(request, 'ab_test_experiment', None)
@@ -407,7 +415,42 @@ def create_app() -> FastAPI:
 
             # Dial the prospect via configured telephony provider
             if request.phone_number:
-                if settings.telephony_provider == "vonage" and settings.vonage_api_key:
+                if settings.telephony_provider == "signalwire" and settings.signalwire_project_id:
+                    sw = SignalWireTelephony(
+                        project_id=settings.signalwire_project_id,
+                        api_token=settings.signalwire_api_token,
+                        space_name=settings.signalwire_space_name,
+                        phone_number=settings.signalwire_phone_number,
+                    )
+                    call_sid = await sw.make_outbound_call(
+                        to_number=request.phone_number,
+                        call_id=call_id,
+                        ws_url=ws_url,
+                    )
+                    active_calls[call_id]["call_sid"] = call_sid
+                    active_calls[call_id]["telephony"] = sw
+
+                    if bridge:
+                        bridge.twilio_call_sid = call_sid
+                        bridge.twilio_telephony = sw  # Duck-typed: inherits TwilioTelephony
+                        bridge.webhook_base_url = base_url
+                        # Provide Twilio-SDK-compatible client for warm transfer
+                        from ..providers.signalwire_telephony import SignalWireClient
+                        bridge.twilio_client = SignalWireClient(
+                            project_id=settings.signalwire_project_id,
+                            api_token=settings.signalwire_api_token,
+                            space_name=settings.signalwire_space_name,
+                            phone_number=settings.signalwire_phone_number,
+                        )
+
+                    logger.info("signalwire_call_initiated",
+                        call_id=call_id,
+                        call_sid=call_sid,
+                        to=request.phone_number,
+                        ws_url=ws_url,
+                    )
+
+                elif settings.telephony_provider == "vonage" and settings.vonage_api_key:
                     vonage = VonageTelephony(
                         api_key=settings.vonage_api_key,
                         api_secret=settings.vonage_api_secret,
@@ -424,8 +467,8 @@ def create_app() -> FastAPI:
                     active_calls[call_id]["vonage_telephony"] = vonage
 
                     if bridge:
-                        bridge.twilio_call_sid = call_uuid  # Reuse field for call reference
-                        bridge.twilio_telephony = vonage     # Duck-typed: has send_clear()
+                        bridge.twilio_call_sid = call_uuid
+                        bridge.twilio_telephony = vonage
                         bridge.webhook_base_url = base_url
 
                     logger.info("vonage_call_initiated",
@@ -552,7 +595,14 @@ def create_app() -> FastAPI:
         providers["quality_pipeline"] = "ready" if quality_ready else "not_configured"
 
         # Check telephony provider
-        if settings.telephony_provider == "vonage":
+        if settings.telephony_provider == "signalwire":
+            telephony_ready = bool(
+                settings.signalwire_project_id
+                and settings.signalwire_api_token
+                and settings.signalwire_space_name
+                and settings.signalwire_phone_number
+            )
+        elif settings.telephony_provider == "vonage":
             telephony_ready = bool(
                 settings.vonage_api_key
                 and settings.vonage_application_id
@@ -692,7 +742,19 @@ def create_app() -> FastAPI:
         ws_url = base_url.replace("https://", "wss://").replace("http://", "ws://")
 
         try:
-            if settings.telephony_provider == "vonage":
+            if settings.telephony_provider == "signalwire":
+                # SignalWire inbound: return TwiML XML (same as Twilio)
+                sw = SignalWireTelephony(
+                    project_id=settings.signalwire_project_id,
+                    api_token=settings.signalwire_api_token,
+                    space_name=settings.signalwire_space_name,
+                    phone_number=settings.signalwire_phone_number,
+                )
+                twiml = sw.generate_inbound_twiml(call_id, ws_url)
+                logger.info("inbound_call_received", call_id=call_id, provider="signalwire")
+                return Response(content=twiml, media_type="application/xml")
+
+            elif settings.telephony_provider == "vonage":
                 # Vonage inbound: return NCCO JSON
                 vonage = VonageTelephony(
                     api_key=settings.vonage_api_key,
@@ -904,7 +966,14 @@ def create_app() -> FastAPI:
                     call_data["bridge"] = None
 
             # Instantiate the appropriate telephony handler
-            if settings.telephony_provider == "vonage":
+            if settings.telephony_provider == "signalwire":
+                telephony = SignalWireTelephony(
+                    project_id=settings.signalwire_project_id,
+                    api_token=settings.signalwire_api_token,
+                    space_name=settings.signalwire_space_name,
+                    phone_number=settings.signalwire_phone_number,
+                )
+            elif settings.telephony_provider == "vonage":
                 telephony = VonageTelephony(
                     api_key=settings.vonage_api_key,
                     api_secret=settings.vonage_api_secret,

@@ -3209,7 +3209,7 @@ class CallBridge:
             call_sid=self.twilio_call_sid,
             agent_dids=config.agent_dids,
             has_twilio=self.twilio_client is not None,
-            webhook_base_url=self.webhook_base_url or "https://wellheard-ai.fly.dev")
+            webhook_base_url=self.webhook_base_url or "https://wellheard.ai")
 
         if not self.twilio_client:
             logger.error("transfer_no_twilio_client",
@@ -3241,7 +3241,7 @@ class CallBridge:
                 contact_name=self.prospect_name or "",
                 last_name="",
                 call_id=self.call_id,
-                webhook_base_url=self.webhook_base_url or "https://wellheard-ai.fly.dev",
+                webhook_base_url=self.webhook_base_url or "https://wellheard.ai",
             )
             logger.info("transfer_initiated_ok",
                 call_id=self.call_id,
@@ -3430,7 +3430,7 @@ class CallBridge:
 
         try:
             await mgr.move_prospect_to_conference(
-                self.webhook_base_url or "https://wellheard-ai.fly.dev")
+                self.webhook_base_url or "https://wellheard.ai")
         except Exception as e:
             logger.error("warm_handoff_move_failed",
                 call_id=self.call_id, error=str(e))

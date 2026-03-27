@@ -68,16 +68,10 @@ class GroqLLMProvider(LLMProvider):
 
         # Add system prompt with cache control if enabled
         if system_prompt:
+            # Groq does not support cache_control — always use plain system message
+            full_messages.append({"role": "system", "content": system_prompt})
             if use_cache and self._cache_enabled:
-                # Mark system prompt as cacheable
-                full_messages.append({
-                    "role": "system",
-                    "content": system_prompt,
-                    "cache_control": {"type": "ephemeral"},  # Groq cache TTL
-                })
                 self._cached_system_prompt = system_prompt
-            else:
-                full_messages.append({"role": "system", "content": system_prompt})
 
         full_messages.extend(messages)
 

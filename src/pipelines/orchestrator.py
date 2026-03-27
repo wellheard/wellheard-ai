@@ -104,6 +104,7 @@ class AgentConfig:
     greeting: str = ""  # Optional first message
     pitch_text: str = ""  # Pre-baked pitch (Phase 2) — synthesized during dial
     transfer_config: Optional[dict] = None  # Warm transfer configuration
+    speed: float = 1.0  # TTS speed multiplier
 
 
 class VoicePipelineOrchestrator:

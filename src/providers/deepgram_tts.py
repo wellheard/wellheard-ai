@@ -122,6 +122,76 @@ class DeepgramTTSProvider(TTSProvider):
             logger.error("deepgram_tts_error", error=str(e))
             raise
 
+    async def synthesize_single(self, text: str, voice_id: str = "") -> Optional[bytes]:
+        """Synthesize a complete text string into a single PCM16 audio blob."""
+        if not self._client:
+            await self.connect()
+
+        model = voice_id or self.model
+        audio_chunks = []
+
+        try:
+            async with self._client.stream(
+                "POST",
+                f"/speak?model={model}&encoding=linear16&sample_rate=16000",
+                json={"text": text},
+            ) as response:
+                response.raise_for_status()
+                async for chunk in response.aiter_bytes(chunk_size=4096):
+                    audio_chunks.append(chunk)
+
+            if audio_chunks:
+                return b"".join(audio_chunks)
+            return None
+
+        except Exception as e:
+            logger.error("deepgram_tts_synthesize_single_error", error=str(e), text=text[:50])
+            return None
+
+    async def synthesize_single_streamed(
+        self, text: str, voice_id: str = ""
+    ) -> AsyncIterator[dict]:
+        """Stream synthesis of a single text string, yielding audio chunks."""
+        if not self._client:
+            await self.connect()
+
+        model = voice_id or self.model
+        trace = LatencyTrace(provider=self.name, operation="synthesize_single_streamed")
+
+        try:
+            async with self._client.stream(
+                "POST",
+                f"/speak?model={model}&encoding=linear16&sample_rate=16000",
+                json={"text": text},
+            ) as response:
+                response.raise_for_status()
+                async for chunk in response.aiter_bytes(chunk_size=4096):
+                    if self._cancel_event.is_set():
+                        return
+
+                    if not trace.first_result_time:
+                        trace.mark_first_result()
+
+                    self._health.record_success(trace.time_to_first_result_ms)
+
+                    yield {
+                        "audio": chunk,
+                        "sample_rate": 16000,
+                        "is_complete": False,
+                        "ttfb_ms": trace.time_to_first_result_ms,
+                    }
+
+            yield {"audio": b"", "sample_rate": 16000, "is_complete": True, "ttfb_ms": trace.time_to_first_result_ms}
+
+        except Exception as e:
+            self._health.record_error()
+            logger.error("deepgram_tts_synthesize_single_streamed_error", error=str(e), text=text[:50])
+            raise
+
+    def update_voice_params(self, speed: float = None, emotion: str = None) -> None:
+        """Update voice parameters (no-op for Deepgram Aura — speed/emotion not supported)."""
+        pass
+
     async def cancel(self) -> None:
         """Cancel current synthesis for barge-in."""
         self._cancel_event.set()

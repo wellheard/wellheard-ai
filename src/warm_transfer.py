@@ -421,7 +421,7 @@ class WarmTransferManager:
             gather_url = f"{webhook_base_url}/v1/transfer/agent-gather/{self._call_id}"
             status_url = f"{webhook_base_url}/v1/transfer/agent-status"
 
-            caller_id = self.config.caller_id or "+13187222561"
+            caller_id = self.config.caller_id or "+19297090284"  # Default to SignalWire number
 
             # Create outbound call to agent with Gather TwiML
             call_kwargs = {

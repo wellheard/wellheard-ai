@@ -39,6 +39,7 @@ TRANSFER_CONFIG = {
     "machine_detection": True,
     "whisper_enabled": True,
     "callback_enabled": True,
+    "caller_id": "+19297090284",  # SignalWire purchased number — required as From for transfer calls
 }
 
 
